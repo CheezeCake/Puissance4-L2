@@ -5,7 +5,9 @@
 #include <SDL/SDL_image.h>
 #include <SDL/SDL_ttf.h>
 #include "gui.h"
+#include "button.h"
 #include "textInput.h"
+#include "ai.h"
 #include "config.h"
 
 using namespace std;
@@ -67,15 +69,14 @@ void Gui::display_board(Game &g)
 	}
 }
 
-void Gui::alternate_player(int &current_player)
+void Gui::alternate_player(char &current_player)
 {
-	current_player = (current_player == PLAYER_1) ? PLAYER_2
-												  : PLAYER_1;
+	current_player = Game::other_player(current_player);
 }
 
 void Gui::play(Game &g)
 {
-	int current_player = PLAYER_1;
+	char current_player = PLAYER_1;
 	bool done = false;
 	SDL_Event event;
 
@@ -126,7 +127,104 @@ void Gui::play(Game &g)
 	}
 }
 
-void Gui::ask_value(SDL_Surface *screen, char *name, int &value, int def)
+void Gui::play_vs_ai(Game &g, int difficulty)
+{
+	bool done = false;
+	SDL_Event event;
+
+	while(!done)
+	{
+		bool move = true;
+		char player = PLAYER_1;
+		AI ai(PLAYER_2, difficulty); 
+		
+		SDL_WaitEvent(&event);
+		if(event.type == SDL_QUIT)
+		{
+			done = true;
+			SDL_PushEvent(&event);
+		}
+		else if(event.type == SDL_MOUSEBUTTONUP)
+		{
+			if(event.button.button == SDL_BUTTON_LEFT &&
+			   g.make_move(player, (event.button.x/SPRITE_WIDTH)-(size-g.get_width())/2))
+				move = true;
+		}
+		else if(event.type == SDL_KEYUP)
+		{
+			int way = -1;
+			if(event.key.keysym.sym == SDLK_RIGHT)
+				way = RIGHT;
+			else if(event.key.keysym.sym == SDLK_LEFT)
+				way = LEFT;
+
+			if(way != -1)
+			{
+				g.rotate(way);
+				move = true;
+			}
+		}
+
+		if(move && g.done())
+			done = true;
+		move = false;
+
+		SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+		display_board(g);
+		SDL_Flip(screen);
+	}
+}
+
+int Gui::ask_difficulty(SDL_Surface *screen)
+{
+	TTF_Font *font = TTF_OpenFont((char*)"fonts/arial.ttf", HEIGHT/20);
+	SDL_Color color = {255, 255, 255, 0};
+	SDL_Surface *tile = TTF_RenderText_Blended(font, (char*)"difficulty",
+											   color);
+	SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+	
+	Button easy((char*)"images/button_easy.png");
+	easy.set_xy(WIDTH/2-easy.get_width()/2, HEIGHT/7);
+	Button normal((char*)"images/button_normal.png");
+	normal.set_xy(easy.get_x(), easy.get_y()+(easy.get_height()*1.5));
+	Button hard((char*)"images/button_hard.png");
+	hard.set_xy(easy.get_x(), normal.get_y()+(normal.get_height()*1.5));
+	
+	bool done = false;
+	SDL_Event event;
+	SDL_Rect pos;
+	pos.x = WIDTH/2-tile->w/2;
+	pos.y = HEIGHT/20;
+	SDL_BlitSurface(tile, NULL, screen, &pos);
+	
+	while(!done)
+	{
+		SDL_WaitEvent(&event);
+		if(event.type == SDL_QUIT)
+			done = true;
+		else if(event.type == SDL_MOUSEBUTTONUP)
+		{
+			int x = event.button.x;
+			int y = event.button.y;
+
+			if(easy.is_clicked(x, y))
+				return EASY;
+			else if(normal.is_clicked(x, y))
+				return NORMAL;
+			else if(hard.is_clicked(x, y))
+				return HARD;
+		}
+
+		easy.display(screen);
+		normal.display(screen);
+		hard.display(screen);
+
+		SDL_Flip(screen);
+	}
+	return -1;
+}
+
+int Gui::ask_value(SDL_Surface *screen, char *name, int def)
 {
 	TTF_Font *font = TTF_OpenFont((char*)"fonts/arial.ttf", HEIGHT/20);
 	SDL_Color color = {255, 255, 255, 0};
@@ -149,6 +247,7 @@ void Gui::ask_value(SDL_Surface *screen, char *name, int &value, int def)
 		input.set_text(oss.str());
 	}
 	
+	int value;	
 	do
 	{	
 		input.capture_text(screen);
@@ -161,6 +260,17 @@ void Gui::ask_value(SDL_Surface *screen, char *name, int &value, int def)
 	
 	SDL_FreeSurface(title);
 	TTF_CloseFont(font);
+
+	return value;
+}
+
+void Gui::ask_game_dimensions(SDL_Surface *screen, int &width, int &height, int &connect_len,
+							  int &nb_connect)
+{
+	width = ask_value(screen, (char*)"Largeur", 7);
+	height = ask_value(screen, (char*)"Hauteur", 6);
+	connect_len = ask_value(screen, (char*)"Taille alignements", 4);
+	nb_connect = ask_value(screen, (char*)"Nombre d'alignements", 1);
 }
 
 void Gui::winner(Game &game)
