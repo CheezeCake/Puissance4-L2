@@ -5,7 +5,7 @@
 #include "config.h"
 
 enum {LEFT, RIGHT};
-enum {EASY = 3, NORMAL = 5, HARD = 6};
+enum {EASY = 6, NORMAL = 12, HARD = 18};
 
 class Game
 {
