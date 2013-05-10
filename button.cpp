@@ -54,3 +54,23 @@ bool Button::is_clicked(int x, int y)
 	return ((x >= this->x) && (x <= this->x+surface->w) &&
 			(y >= this->y) && (y <= this->y+surface->h));
 }
+
+int Button::get_width()
+{
+	return surface->w;
+}
+
+int Button::get_height()
+{
+	return surface->h;
+}
+
+int Button::get_x()
+{
+	return x;
+}
+
+int Button::get_y()
+{
+	return y;
+}

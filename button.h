@@ -11,6 +11,10 @@ public:
 	void set_y(int);
 	void set_xy(int, int);
 	bool is_clicked(int, int);
+	int get_x();
+	int get_y();
+	int get_width();
+	int get_height();
 
 private:
 	int x;
