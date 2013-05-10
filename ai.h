@@ -4,6 +4,9 @@
 #include "game.h"
 #include "config.h"
 
+const int SCORE_MAX = 1000;
+const int SCORE_MIN = -1000;
+
 class AI
 {
 public:
@@ -19,8 +22,8 @@ public:
 	inline int calc_score(int, int);
 
 	void make_move(Game&);
-	int max(Game&);
-	int min(Game&);
+	int max(Game&, int);
+	int min(Game&, int);
 
 private:
 	char player_id;

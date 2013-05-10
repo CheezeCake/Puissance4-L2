@@ -6,6 +6,82 @@ AI::AI(char player_id, int difficulty)
 	this->player_id = player_id;
 }
 
+void AI::make_move(Game &game)
+{
+	int score_max = SCORE_MIN;
+	int col_max = -1;
+
+	for(int i = 0; i < game.get_width(); i++)
+	{
+		if(game.make_move(player_id, i))
+		{
+			int score = max(game, depth-1);
+
+			if(score > score_max) //ajouter de l'aléatoire
+			{
+				score_max = score;
+				col_max = i;
+			}
+			game.cancel_move(i);
+		}
+	}
+
+	game.make_move(player_id, col_max);
+}
+
+int AI::max(Game &game, int depth)
+{
+	if((depth == 0) || game.done())
+		return evaluate(game);
+	
+	int score_max = SCORE_MIN;
+	int col_max = -1;
+
+	for(int i = 0; i < game.get_width(); i++)
+	{
+		if(game.make_move(player_id, i))
+		{
+			int score = min(game, depth-1);
+
+			if(score > score_max)
+			{
+				score_max = score;
+				col_max = i;
+			}
+			game.cancel_move(i);
+		}
+	}
+	
+	return score_max;
+}
+
+int AI::min(Game &game, int depth)
+{
+	if((depth == 0) || game.done())
+		return evaluate(game);
+	
+	int score_min = SCORE_MAX;
+	int col_min = -1;
+	char player = Game::other_player(player_id);
+
+	for(int i = 0; i < game.get_width(); i++)
+	{
+		if(game.make_move(player, i))
+		{
+			int score = max(game, depth-1);
+
+			if(score < score_min)
+			{
+				score_min = score;
+				col_min = i;
+			}
+			game.cancel_move(i);
+		}
+	}
+
+	return score_min;
+}
+	
 bool AI::possible_connect_line(Game &game, int line, int begin, int end)
 {
 	int count = 0;
@@ -52,7 +128,7 @@ bool AI::possible_connect_col(Game &game, int col, int begin, int end)
 
 int AI::calc_score(int connect_len, int count)
 {
-	return (connect_len/(connect_len-count))*10; //?
+	return (connect_len/(connect_len-count))*10; //bien ?
 }
 
 int AI::evaluate(Game &game)
@@ -63,7 +139,7 @@ int AI::evaluate(Game &game)
 		if(winner == TIE)
 			return 0;
 
-		return (winner == player_id) ? 1000 : -1000;
+		return (winner == player_id) ? SCORE_MAX : SCORE_MIN;
 	}
 
 	int score = 0;
