@@ -8,6 +8,6 @@ const int BPP = 32;
 const int SPRITE_WIDTH = 75;
 const int SPRITE_HEIGHT = 75;
 
-enum {PLAYER_1, PLAYER_2, EMPTY, TIE};
+enum {PLAYER_1 = 0, PLAYER_2, EMPTY, TIE};
 
 #endif
