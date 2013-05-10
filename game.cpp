@@ -93,6 +93,9 @@ void Game::cancel_move(int j)
 	while((board[i][j] == EMPTY) && (i < height))
 		i++;
 	board[i][j] = EMPTY;
+
+	connections[PLAYER_1] = connections[PLAYER_2] = 0;
+	winner = TIE;
 }
 
 void Game::rotate(int direction)
