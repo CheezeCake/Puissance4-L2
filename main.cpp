@@ -25,8 +25,11 @@ int main(int argc, char **argv)
 	SDL_Surface *screen = SDL_SetVideoMode(WIDTH, HEIGHT, BPP, SDL_HWSURFACE);
 	bool done = false;
 	SDL_Event event;
+
 	Button one((char*)"images/button_1vs1.png");
 	one.set_xy(WIDTH/3, HEIGHT/10);
+	Button vs_ai((char*)"images/button_vs_ia.png");
+	vs_ai.set_xy(WIDTH/3, HEIGHT/3);
 	
 
 	while(!done)
@@ -35,13 +38,10 @@ int main(int argc, char **argv)
 
 		if(event.type == SDL_MOUSEBUTTONUP)
 		{
+			int width, height, connect_len, nb_connect;
 			if(one.is_clicked(event.button.x, event.button.y))
 			{
-				int width, height, connect_len, nb_connect;
-				Gui::ask_value(screen, (char*)"Largeur", width, 7);
-				Gui::ask_value(screen, (char*)"Hauteur", height, 6);
-				Gui::ask_value(screen, (char*)"Taille alignements", connect_len, 4);
-				Gui::ask_value(screen, (char*)"Nombre d'alignements", nb_connect, 1);
+				Gui::ask_game_dimensions(screen, width, height, connect_len, nb_connect);
 
 				Game game(width, height, connect_len, nb_connect);
 				Gui gui(width, height);
@@ -50,6 +50,23 @@ int main(int argc, char **argv)
 				gui.winner(game);
 				
 				screen = setup_new_screen();
+			}
+			else if(vs_ai.is_clicked(event.button.x, event.button.y))
+			{
+				Gui::ask_game_dimensions(screen, width, height, connect_len, nb_connect);
+				int difficulty = Gui::ask_difficulty(screen);
+				
+				if(difficulty != -1)
+				{
+					Game game(width, height, connect_len, nb_connect);
+					Gui gui(width, height);
+
+					gui.play_vs_ai(game, difficulty);
+					gui.winner(game);
+					screen = setup_new_screen();
+				}
+				else
+					done = true;
 			}
 		}
 		
@@ -60,6 +77,7 @@ int main(int argc, char **argv)
 
 		SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
 		one.display(screen);
+		vs_ai.display(screen);
 
 		SDL_Flip(screen);
 	}
