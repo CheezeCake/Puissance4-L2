@@ -132,36 +132,52 @@ void Gui::play_vs_ai(Game &g, int difficulty)
 	bool done = false;
 	SDL_Event event;
 
+	bool move = true;
+	char current_player = PLAYER_1;
+	AI ai(PLAYER_2, difficulty);
+	
 	while(!done)
 	{
-		bool move = true;
-		char player = PLAYER_1;
-		AI ai(PLAYER_2, difficulty); 
+		if(current_player == PLAYER_2)
+		{
+			cout << "Thinking...\n";
+			ai.make_move(g);
+			alternate_player(current_player);
+			move = true;
+			cout << "Done.\n";
+		}
+		else
+		{
+			SDL_WaitEvent(&event);
 		
-		SDL_WaitEvent(&event);
-		if(event.type == SDL_QUIT)
-		{
-			done = true;
-			SDL_PushEvent(&event);
-		}
-		else if(event.type == SDL_MOUSEBUTTONUP)
-		{
-			if(event.button.button == SDL_BUTTON_LEFT &&
-			   g.make_move(player, (event.button.x/SPRITE_WIDTH)-(size-g.get_width())/2))
-				move = true;
-		}
-		else if(event.type == SDL_KEYUP)
-		{
-			int way = -1;
-			if(event.key.keysym.sym == SDLK_RIGHT)
-				way = RIGHT;
-			else if(event.key.keysym.sym == SDLK_LEFT)
-				way = LEFT;
-
-			if(way != -1)
+			if(event.type == SDL_QUIT)
 			{
-				g.rotate(way);
-				move = true;
+				done = true;
+				SDL_PushEvent(&event);
+			}
+			else if(event.type == SDL_MOUSEBUTTONUP)
+			{
+				if(event.button.button == SDL_BUTTON_LEFT &&
+				   g.make_move(current_player, (event.button.x/SPRITE_WIDTH)-(size-g.get_width())/2))
+				{
+					alternate_player(current_player);
+					move = true;
+				}
+			}
+			else if(event.type == SDL_KEYUP)
+			{
+				int way = -1;
+				if(event.key.keysym.sym == SDLK_RIGHT)
+					way = RIGHT;
+				else if(event.key.keysym.sym == SDLK_LEFT)
+					way = LEFT;
+
+				if(way != -1)
+				{
+					g.rotate(way);
+					alternate_player(current_player);
+					move = true;
+				}
 			}
 		}
 
