@@ -353,3 +353,8 @@ int Game::get_nb_connect(int player_id)
 {
 	return (player_id > PLAYER_2) ? 0 : connections[player_id];
 }
+
+char Game::other_player(char player_id)
+{
+	return (player_id == PLAYER_1) ? PLAYER_2 : PLAYER_1;
+}

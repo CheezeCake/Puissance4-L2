@@ -35,6 +35,7 @@ public:
 		
 	static char** create_board(int, int);
 	static void delete_board(char**, int);
+	static char other_player(char player_id);
 
 private:
 	void gravity();
