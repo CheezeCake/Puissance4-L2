@@ -5,7 +5,10 @@
 #include "config.h"
 
 enum {LEFT, RIGHT};
-enum {EASY = 6, NORMAL = 12, HARD = 18};
+
+const int EASY = 2;
+const int NORMAL = 4;
+const int HARD = 6;
 
 class Game
 {
@@ -19,7 +22,6 @@ public:
 	void rotate(int);
 	
 	char get_value(int, int);
-	void set_value(int, int, char);
 	
 	bool done();
 	
@@ -31,7 +33,7 @@ public:
 	int get_height();
 	int get_connect_len();
 	int get_nb_connect();
-	int get_nb_connect(int);
+	int get_nb_connect(char);
 		
 	static char** create_board(int, int);
 	static void delete_board(char**, int);
@@ -41,11 +43,13 @@ private:
 	void gravity();
 	void gravity_on_col(int);
 	
+	void check();
 	bool update_count(char, char, int&);
 	bool check_lines();
 	bool check_columns();	
 	bool check_diagonals1();
 	bool check_diagonals2();
+	bool check_tie();
 	
 	char **board;
 	int width;

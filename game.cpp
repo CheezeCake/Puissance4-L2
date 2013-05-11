@@ -10,7 +10,7 @@ Game::Game(int width, int height, int connect_len, int nb_connect)
 	this->width = width;
 	this->height = height;
 	board = create_board(width, height);
-	winner = TIE;
+	winner = EMPTY;
 	connections[PLAYER_1] = connections[PLAYER_2] = 0;
 }
 
@@ -71,11 +71,6 @@ char Game::get_value(int i, int j)
 	return board[i][j];
 }
 
-void Game::set_value(int i, int j, char val)
-{
-	board[i][j] = val;
-}
-
 bool Game::make_move(int player_id, int col)
 {
 	if(board[0][col] != EMPTY)
@@ -84,6 +79,8 @@ bool Game::make_move(int player_id, int col)
 	board[0][col] = player_id;
 	gravity_on_col(col);
 
+	check(); //set winner
+
 	return true;
 }
 
@@ -91,11 +88,11 @@ void Game::cancel_move(int j)
 {
 	int i = 0;
 	while((board[i][j] == EMPTY) && (i < height))
-		i++;
+		++i;
 	board[i][j] = EMPTY;
 
-	connections[PLAYER_1] = connections[PLAYER_2] = 0;
-	winner = TIE;
+	winner = EMPTY;
+	check();
 }
 
 void Game::rotate(int direction)
@@ -154,21 +151,29 @@ void Game::gravity_on_col(int col)
 
 bool Game::tie()
 {
+	return (winner == TIE);
+}
+
+void Game::check_tie()
+{
 	for(int i = 0; i < width; i++)
-		if(board[0][i] == EMPTY)
-			return false;
+		if(board[0][i] == EMPTY);
+			return;
 	
-	return true;
+	winner = TIE;
 }
 
 bool Game::done()
 {
-	if(check_lines() || check_columns() || check_diagonals1() ||
-	   check_diagonals2() || tie())
-		return true;
-	
+	return (winner != EMPTY);
+}
+
+void Game::check()
+{
 	connections[PLAYER_1] = connections[PLAYER_2] = 0;
-	return false;
+	if(check_lines() ||	check_columns() || 	check_diagonals1() ||
+	   check_diagonals2() || check_tie())
+		return;
 }
 
 bool Game::update_count(char previous, char current, int &count)
@@ -182,7 +187,7 @@ bool Game::update_count(char previous, char current, int &count)
 
 	if(count == connect_len)
 	{
-		connections[(int)current]++;
+		++connections[(int)current];
 		count = 0;
 	}
 
@@ -200,7 +205,7 @@ bool Game::check_lines()
 	for(int i = height-1; i >= 0; i--)
 	{
 		int count = 1;
-		for(int j = 1; j < width && (width-j >= connect_len-count); j++)
+		for(int j = 1; (j < width) && (width-j >= connect_len-count); j++)
 		{
 			char previous = board[i][j-1];
 			char current = board[i][j];
@@ -209,6 +214,7 @@ bool Game::check_lines()
 				return true;
 		}
 	}
+
 	return false;
 }
 
@@ -217,7 +223,7 @@ bool Game::check_columns()
 	for(int i = 0; i < width; i++)
 	{
 		int count = 1;
-		for(int j = height-2; j >= 0 && (connect_len-count <= j+1); j--)
+		for(int j = height-2; (j >= 0) && (connect_len-count <= j+1); j--)
 		{
 			char previous = board[j+1][i];
 			char current = board[j][i];
@@ -226,6 +232,7 @@ bool Game::check_columns()
 				return true;
 		}
 	}
+
 	return false;
 }
 
@@ -236,7 +243,7 @@ bool Game::check_diagonals1()
 		return false;
 	
 	//diagonales bg -> hd
-	for(int i = 0; i < width && (width-i >= connect_len); i++)
+	for(int i = 0; (i < width) && (width-i >= connect_len); i++)
 	{
 		int start = height-1;
 		int count = 1, j = 1;
@@ -252,7 +259,7 @@ bool Game::check_diagonals1()
 		}
 	}
 	
-	for(int i = height-2; i >= 0 && (i+1 >= connect_len); i--)
+	for(int i = height-2; (i >= 0) && (i+1 >= connect_len); i--)
 	{
 		int start = 0;
 		int count = 1, j = 1;
@@ -278,7 +285,7 @@ bool Game::check_diagonals2()
 		return false;
 	
 	//diagonales bd -> hg
-	for(int i = width-1; i >= 0 && i+1 >= connect_len; i--)
+	for(int i = width-1; (i >= 0) && (i+1 >= connect_len); i--)
 	{
 		int start = height-1;
 		int count = 1, j = 1;
@@ -294,7 +301,7 @@ bool Game::check_diagonals2()
 		}
 	}
 	
-	for(int i = height-2; i >= 0 && (i+1 >= connect_len); i--)
+	for(int i = height-2; (i >= 0) && (i+1 >= connect_len); i--)
 	{
 		int start = height-1;
 		int count = 1, j = 1;
@@ -316,15 +323,14 @@ bool Game::check_diagonals2()
 string Game::get_winner()
 {
 	//partie non finie
-	if(winner == TIE && !tie())
+	if(winner == EMPTY)
 		return "";
 
 	//ex-aequo	
-	if(tie() && winner == TIE)
+	if(tie())
 		return "Egalite";
 	
-	return (winner == PLAYER_1) ? "Joueur 1"
-								: "Joueur 2";
+	return (winner == PLAYER_1) ? "Joueur 1" : "Joueur 2";
 }
 
 int Game::get_winner_id()
@@ -352,9 +358,9 @@ int Game::get_nb_connect()
 	return nb_connect;
 }
 
-int Game::get_nb_connect(int player_id)
+int Game::get_nb_connect(char player_id)
 {
-	return (player_id > PLAYER_2) ? 0 : connections[player_id];
+	return connections[(int)player_id];
 }
 
 char Game::other_player(char player_id)
