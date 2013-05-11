@@ -154,13 +154,14 @@ bool Game::tie()
 	return (winner == TIE);
 }
 
-void Game::check_tie()
+bool Game::check_tie()
 {
 	for(int i = 0; i < width; i++)
 		if(board[0][i] == EMPTY);
-			return;
+			return false;
 	
 	winner = TIE;
+	return true;
 }
 
 bool Game::done()
