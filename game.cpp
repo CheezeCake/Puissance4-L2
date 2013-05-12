@@ -118,6 +118,8 @@ void Game::rotate(int direction)
 	width = tmp;
 
 	gravity();
+
+	check();
 }
 
 inline void Game::gravity()
@@ -157,7 +159,7 @@ bool Game::tie()
 bool Game::check_tie()
 {
 	for(int i = 0; i < width; i++)
-		if(board[0][i] == EMPTY);
+		if(board[0][i] == EMPTY)
 			return false;
 	
 	winner = TIE;
@@ -250,9 +252,9 @@ bool Game::check_diagonals1()
 		int count = 1, j = 1;
 		while((start-j >= 0) && (i+j < width))
 		{
-			char previous = board[start][i];
+			char previous = board[start-j+1][i+j-1];
 			char current = board[start-j][i+j];
-				
+			
 			if(update_count(previous, current, count))
 				return true;
 
@@ -266,9 +268,9 @@ bool Game::check_diagonals1()
 		int count = 1, j = 1;
 		while((start+j < width) && (i-j >= 0))
 		{
-			char previous = board[i][start];
+			char previous = board[i-j+1][start+j-1];
 			char current = board[i-j][start+j];
-
+			
 			if(update_count(previous, current, count))
 				return true;
 
@@ -292,9 +294,9 @@ bool Game::check_diagonals2()
 		int count = 1, j = 1;
 		while((start-j >= 0) && (i-j >= 0))
 		{
-			char previous = board[start][i];
+			char previous = board[start-j+1][i-j+1];
 			char current = board[start-j][i-j];
-				
+			
 			if(update_count(previous, current, count))
 				return true;
 
@@ -304,13 +306,13 @@ bool Game::check_diagonals2()
 	
 	for(int i = height-2; (i >= 0) && (i+1 >= connect_len); i--)
 	{
-		int start = height-1;
+		int start = width-1;
 		int count = 1, j = 1;
 		while((start-j >= 0) && (i-j >= 0))
 		{
-			char previous = board[start][i];
-			char current = board[start-i][i-j];
-			
+			char previous = board[i-j+1][start-j+1];
+			char current = board[i-j][start-j];
+
 			if(update_count(previous, current, count))
 				return true;
 
