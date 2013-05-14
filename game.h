@@ -17,11 +17,12 @@ public:
 	~Game();
 
 	void display_cli();
-	bool make_move(int, int);
+	bool make_move(int);
 	void cancel_move(int);
 	void rotate(int);
 	
 	char get_value(int, int);
+	char get_current_player();
 	
 	bool done();
 	
@@ -37,9 +38,10 @@ public:
 		
 	static char** create_board(int, int);
 	static void delete_board(char**, int);
-	static char other_player(char player_id);
+	static char other_player(char);
 
 private:
+	void alternate_player();
 	void gravity();
 	void gravity_on_col(int);
 	
@@ -57,6 +59,7 @@ private:
 	int connect_len; //taille alignement
 	int nb_connect; //nombre alignements
 	
+	char current_player;
 	int connections[2];
 	int winner;
 };

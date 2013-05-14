@@ -10,6 +10,7 @@ Game::Game(int width, int height, int connect_len, int nb_connect)
 	this->width = width;
 	this->height = height;
 	board = create_board(width, height);
+	current_player = PLAYER_1;
 	winner = EMPTY;
 	connections[PLAYER_1] = connections[PLAYER_2] = 0;
 }
@@ -71,13 +72,30 @@ char Game::get_value(int i, int j)
 	return board[i][j];
 }
 
-bool Game::make_move(int player_id, int col)
+char Game::other_player(char player_id)
+{
+	return (player_id == PLAYER_1) ? PLAYER_2 : PLAYER_1;
+}
+
+void Game::alternate_player()
+{
+	current_player = other_player(current_player);
+}
+
+char Game::get_current_player()
+{
+	return current_player;
+}
+
+bool Game::make_move(int col)
 {
 	if(board[0][col] != EMPTY)
 		return false;
 	
-	board[0][col] = player_id;
+	board[0][col] = current_player;
+	alternate_player();
 	gravity_on_col(col);
+
 
 	check(); //set winner
 
@@ -91,6 +109,7 @@ void Game::cancel_move(int j)
 		++i;
 	board[i][j] = EMPTY;
 
+	alternate_player();
 	winner = EMPTY;
 	check();
 }
@@ -118,6 +137,8 @@ void Game::rotate(int direction)
 	width = tmp;
 
 	gravity();
+
+	alternate_player();
 
 	check();
 }
@@ -364,9 +385,4 @@ int Game::get_nb_connect()
 int Game::get_nb_connect(char player_id)
 {
 	return connections[(int)player_id];
-}
-
-char Game::other_player(char player_id)
-{
-	return (player_id == PLAYER_1) ? PLAYER_2 : PLAYER_1;
 }
