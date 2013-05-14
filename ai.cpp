@@ -16,7 +16,7 @@ void AI::make_move(Game &game)
 
 	for(int i = 0; i < game.get_width(); i++)
 	{
-		if(game.make_move(player_id, i))
+		if(game.make_move(i))
 		{
 			int score = max(game, difficulty-1);
 
@@ -29,7 +29,7 @@ void AI::make_move(Game &game)
 		}
 	}
 
-	game.make_move(player_id, col_max);
+	game.make_move(col_max);
 }
 
 int AI::max(Game &game, int depth)
@@ -42,7 +42,7 @@ int AI::max(Game &game, int depth)
 
 	for(int i = 0; i < game.get_width(); i++)
 	{
-		if(game.make_move(player_id, i))
+		if(game.make_move(i))
 		{
 			int score = min(game, depth-1);
 
@@ -65,11 +65,10 @@ int AI::min(Game &game, int depth)
 	
 	int score_min = SCORE_MAX;
 	int col_min = -1;
-	char player = Game::other_player(player_id);
 
 	for(int i = 0; i < game.get_width(); i++)
 	{
-		if(game.make_move(player, i))
+		if(game.make_move(i))
 		{
 			int score = max(game, depth-1);
 

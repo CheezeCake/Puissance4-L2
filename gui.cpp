@@ -69,14 +69,8 @@ void Gui::display_board(Game &g)
 	}
 }
 
-void Gui::alternate_player(char &current_player)
-{
-	current_player = Game::other_player(current_player);
-}
-
 void Gui::play(Game &g)
 {
-	char current_player = PLAYER_1;
 	bool done = false;
 	SDL_Event event;
 
@@ -92,9 +86,8 @@ void Gui::play(Game &g)
 		}
 		else if(event.type == SDL_MOUSEBUTTONUP)
 		{
-			if(event.button.button == SDL_BUTTON_LEFT &&
-			   g.make_move(current_player, (event.button.x/SPRITE_WIDTH)-(size-g.get_width())/2))
-				alternate_player(current_player);
+			if(event.button.button == SDL_BUTTON_LEFT)
+			   g.make_move((event.button.x/SPRITE_WIDTH)-(size-g.get_width())/2);
 		}
 		else if(event.type == SDL_KEYUP)
 		{
@@ -105,10 +98,7 @@ void Gui::play(Game &g)
 				way = LEFT;
 
 			if(way != -1)
-			{
 				g.rotate(way);
-				alternate_player(current_player);
-			}
 		}
 		
 		if(g.done())
@@ -126,16 +116,16 @@ void Gui::play_vs_ai(Game &g, int difficulty)
 	bool done = false;
 	SDL_Event event;
 
-	char current_player = PLAYER_1;
-	AI ai(PLAYER_2, difficulty);
+	char player = g.get_current_player();
+	char player_ai = Game::other_player(player);
+	AI ai(player_ai, difficulty);
 	
 	while(!done)
 	{
-		if(current_player == PLAYER_2)
+		if(g.get_current_player() == player_ai)
 		{
 			cout << "Thinking...\n";
 			ai.make_move(g);
-			alternate_player(current_player);
 			cout << "Done.\n";
 		}
 		else
@@ -149,9 +139,8 @@ void Gui::play_vs_ai(Game &g, int difficulty)
 			}
 			else if(event.type == SDL_MOUSEBUTTONUP)
 			{
-				if(event.button.button == SDL_BUTTON_LEFT &&
-				   g.make_move(current_player, (event.button.x/SPRITE_WIDTH)-(size-g.get_width())/2))
-					alternate_player(current_player);
+				if(event.button.button == SDL_BUTTON_LEFT)
+					g.make_move((event.button.x/SPRITE_WIDTH)-(size-g.get_width())/2);
 			}
 			else if(event.type == SDL_KEYUP)
 			{
@@ -162,10 +151,7 @@ void Gui::play_vs_ai(Game &g, int difficulty)
 					way = LEFT;
 
 				if(way != -1)
-				{
 					g.rotate(way);
-					alternate_player(current_player);
-				}
 			}
 		}
 

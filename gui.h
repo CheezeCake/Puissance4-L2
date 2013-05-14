@@ -9,8 +9,7 @@ public:
 
 	void play(Game&);
 	void play_vs_ai(Game&, int);
-	inline void alternate_player(char&);
-		
+
 	static int ask_value(SDL_Surface*, char*, int def = -1);
 	static void ask_game_dimensions(SDL_Surface*, int&, int&, int&, int&);
 	static int ask_difficulty(SDL_Surface*);
