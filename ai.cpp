@@ -38,8 +38,6 @@ int AI::max(Game &game, int depth)
 		return evaluate(game, depth);
 	
 	int score_max = SCORE_MIN;
-	int col_max = -1;
-
 	for(int i = 0; i < game.get_width(); i++)
 	{
 		if(game.make_move(i))
@@ -47,10 +45,8 @@ int AI::max(Game &game, int depth)
 			int score = min(game, depth-1);
 
 			if(score > score_max)
-			{
 				score_max = score;
-				col_max = i;
-			}
+
 			game.cancel_move(i);
 		}
 	}
@@ -64,7 +60,6 @@ int AI::min(Game &game, int depth)
 		return evaluate(game, depth);
 	
 	int score_min = SCORE_MAX;
-	int col_min = -1;
 
 	for(int i = 0; i < game.get_width(); i++)
 	{
@@ -73,10 +68,8 @@ int AI::min(Game &game, int depth)
 			int score = max(game, depth-1);
 
 			if(score < score_min)
-			{
 				score_min = score;
-				col_min = i;
-			}
+			
 			game.cancel_move(i);
 		}
 	}
