@@ -40,6 +40,20 @@ void Game::delete_board(char **b, int h)
 	delete [] b;
 }
 
+void Game::copy_board(char **dest)
+{
+	for(int i = 0; i < width; i++)
+		for(int j = 0; j < height; j++)
+			dest[i][j] = board[i][j];
+}
+
+void Game::load_board(char **src)
+{
+	for(int i = 0; i < width; i++)
+		for(int j = 0; j < height; j++)
+			board[i][j] = src[i][j];
+}
+
 void Game::display_cli()
 {
 	for(int i = 0; i < height; i++)
