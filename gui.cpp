@@ -168,7 +168,7 @@ int Gui::ask_difficulty(SDL_Surface *screen)
 {
 	TTF_Font *font = TTF_OpenFont((char*)"fonts/arial.ttf", HEIGHT/20);
 	SDL_Color color = {255, 255, 255, 0};
-	SDL_Surface *tile = TTF_RenderText_Blended(font, (char*)"difficulty",
+	SDL_Surface *tile = TTF_RenderText_Blended(font, (char*)"difficulte",
 											   color);
 	SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
 	
