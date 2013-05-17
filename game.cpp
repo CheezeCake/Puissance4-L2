@@ -121,6 +121,10 @@ void Game::cancel_move(int j)
 	int i = 0;
 	while((board[i][j] == EMPTY) && (i < height))
 		++i;
+	
+	if(i == height)
+		return;
+
 	board[i][j] = EMPTY;
 
 	alternate_player();
@@ -240,6 +244,9 @@ bool Game::update_count(char previous, char current, int &count)
 
 bool Game::check_lines()
 {
+	if(width < connect_len)
+		return false;
+
 	for(int i = height-1; i >= 0; i--)
 	{
 		int count = 1;
@@ -258,6 +265,9 @@ bool Game::check_lines()
 
 bool Game::check_columns()
 {
+	if(height < connect_len)
+		return false;
+
 	for(int i = 0; i < width; i++)
 	{
 		int count = 1;
