@@ -3,16 +3,17 @@
 
 using namespace std;
 
-AI::AI(char player_id, int difficulty)
+AI::AI(char ai_id, int difficulty)
 {
 	this->difficulty = difficulty;
-	this->player_id = player_id;
+	this->ai_id = ai_id;
+	player_id = Game::other_player(ai_id);
 }
 
 void AI::make_move(Game &game)
 {
 	int score_max = SCORE_MIN;
-	int col_max = -1;
+	int col_max = 0;
 
 	for(int i = 0; i < game.get_width(); i++)
 	{
@@ -35,7 +36,7 @@ void AI::make_move(Game &game)
 int AI::max(Game &game, int depth)
 {
 	if((depth == 0) || game.done())
-		return evaluate(game, depth);
+		return evaluate(game);
 	
 	int score_max = SCORE_MIN;
 	for(int i = 0; i < game.get_width(); i++)
@@ -57,7 +58,7 @@ int AI::max(Game &game, int depth)
 int AI::min(Game &game, int depth)
 {
 	if((depth == 0) || game.done())
-		return evaluate(game, depth);
+		return evaluate(game);
 	
 	int score_min = SCORE_MAX;
 
@@ -77,4 +78,20 @@ int AI::min(Game &game, int depth)
 	return score_min;
 }
 
-int AI::evaluate(Game &game, int depth) {return 0;}
+int AI::evaluate(Game &game)
+{
+	if(game.done())
+	{
+		if(game.tie())
+			return SCORE_TIE;
+
+		//+depth ?
+		return (game.get_winner_id() == ai_id) ? SCORE_MAX : SCORE_MIN;
+	}
+
+	int score = 0;
+	score += game.get_nb_connect(ai_id)*SCORE_CONNECT;
+	score -= game.get_nb_connect(player_id)*SCORE_CONNECT;
+
+	return score;
+}
