@@ -14,7 +14,7 @@ class AI
 public:
 	AI(char, int);
 	
-	int evaluate(Game&);
+	int evaluate(Game&, int);
 
 	void make_move(Game&);
 	int max(Game&, int);

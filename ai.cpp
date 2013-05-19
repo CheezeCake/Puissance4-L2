@@ -36,7 +36,7 @@ void AI::make_move(Game &game)
 int AI::max(Game &game, int depth)
 {
 	if((depth == 0) || game.done())
-		return evaluate(game);
+		return evaluate(game, depth);
 	
 	int score_max = SCORE_MIN;
 	for(int i = 0; i < game.get_width(); i++)
@@ -58,7 +58,7 @@ int AI::max(Game &game, int depth)
 int AI::min(Game &game, int depth)
 {
 	if((depth == 0) || game.done())
-		return evaluate(game);
+		return evaluate(game, depth);
 	
 	int score_min = SCORE_MAX;
 
@@ -78,15 +78,14 @@ int AI::min(Game &game, int depth)
 	return score_min;
 }
 
-int AI::evaluate(Game &game)
+int AI::evaluate(Game &game, int depth)
 {
 	if(game.done())
 	{
 		if(game.tie())
 			return SCORE_TIE;
 
-		//+depth ?
-		return (game.get_winner_id() == ai_id) ? SCORE_MAX : SCORE_MIN;
+		return (game.get_winner_id() == ai_id) ? SCORE_MAX+depth : SCORE_MIN-depth;
 	}
 
 	int score = 0;
