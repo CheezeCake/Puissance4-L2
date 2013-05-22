@@ -64,7 +64,7 @@ void Gui::display_board(Game &g)
 			pos.x = (j+diff_x/2)*SPRITE_WIDTH;
 			pos.y = (i+diff_y/2)*SPRITE_HEIGHT;
 
-			SDL_BlitSurface(sprites[g.get_value(i, j)], NULL, screen, &pos);
+			SDL_BlitSurface(sprites[(int)g.get_value(i, j)], NULL, screen, &pos);
 		}
 	}
 }
