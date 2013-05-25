@@ -56,6 +56,7 @@ void Game::load_board(char **src, int w, int h)
 	for(int i = 0; i < height; i++)
 		for(int j = 0; j < width; j++)
 			board[i][j] = src[i][j];
+	check();
 }
 
 void Game::display_cli()
