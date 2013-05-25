@@ -42,15 +42,16 @@ void Game::delete_board(char **b, int h)
 
 void Game::copy_board(char **dest)
 {
-	for(int i = 0; i < width; i++)
-		for(int j = 0; j < height; j++)
+	for(int i = 0; i < height; i++)
+		for(int j = 0; j < width; j++)
 			dest[i][j] = board[i][j];
 }
 
 void Game::load_board(char **src)
 {
-	for(int i = 0; i < width; i++)
-		for(int j = 0; j < height; j++)
+	delete_board(board, height);
+	for(int i = 0; i < height; i++)
+		for(int j = 0; j < width; j++)
 			board[i][j] = src[i][j];
 }
 
