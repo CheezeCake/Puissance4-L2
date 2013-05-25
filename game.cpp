@@ -47,8 +47,9 @@ void Game::copy_board(char **dest)
 			dest[i][j] = board[i][j];
 }
 
-void Game::load_board(char **src, int w, int h)
+void Game::load_board(char **src, int w, int h, char player_id)
 {
+	current_player = player_id;
 	delete_board(board, height);
 	board = create_board(w, h);
 	height = h;
@@ -218,6 +219,7 @@ bool Game::done()
 void Game::check()
 {
 	connections[PLAYER_1] = connections[PLAYER_2] = 0;
+	winner = EMPTY;
 	if(check_lines() ||	check_columns() || 	check_diagonals1() ||
 	   check_diagonals2() || check_tie())
 		return;
