@@ -47,9 +47,12 @@ void Game::copy_board(char **dest)
 			dest[i][j] = board[i][j];
 }
 
-void Game::load_board(char **src)
+void Game::load_board(char **src, int w, int h)
 {
 	delete_board(board, height);
+	board = create_board(w, h);
+	height = h;
+	width = w;
 	for(int i = 0; i < height; i++)
 		for(int j = 0; j < width; j++)
 			board[i][j] = src[i][j];
