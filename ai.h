@@ -12,18 +12,21 @@ const int SCORE_CONNECT = 300;
 class AI
 {
 public:
-	AI(char, int);
+	AI(Game*, char, int);
 	
-	int evaluate(Game&, int);
-	void eval_lines(Game&, int&);
+	int evaluate(int);
+	void eval_lines(int&);
+	void eval_cols(int&);
 
-	int score_possible_connect(Game&, int, int, int);
+	inline char get_value(int, int, bool);
+	int score_possible_connect(int, int, int, bool);
 
-	void make_move(Game&);
-	int max(Game&, int);
-	int min(Game&, int);
+	void make_move();
+	int max(int);
+	int min(int);
 
 private:
+	Game *game;
 	char ai_id;
 	char player_id;
 	int difficulty;
