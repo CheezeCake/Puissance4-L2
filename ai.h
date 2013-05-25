@@ -22,8 +22,8 @@ public:
 	int score_possible_connect(int, int, int, bool);
 
 	void make_move();
-	int max(int);
-	int min(int);
+	int min_max(int);
+	bool change_score(int&, int, bool);
 
 private:
 	Game *game;

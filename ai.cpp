@@ -1,5 +1,6 @@
 #include <iostream>
 #include "ai.h"
+#include "rand.h"
 
 using namespace std;
 
@@ -16,19 +17,19 @@ void AI::make_move()
 	int score_max = SCORE_MIN;
 	int col_max = 0;
 	bool rotate = false;
-	int direction;
+	int direction = LEFT;
 
 	for(int i = 0; i < game->get_width(); i++)
 	{
 		if(game->make_move(i))
 		{
-			int score = min(difficulty-1);
-			if(score > score_max) //ajouter de l'aléatoire
-			{
-				score_max = score;
-				col_max = i;
-			}
+			int score = min_max(difficulty-1);
 			game->cancel_move(i);
+
+			cout << score << endl;
+
+			if(change_score(score_max, score, true))
+				col_max = i;
 		}
 	}
 
@@ -41,14 +42,13 @@ void AI::make_move()
 	for(int i = 0; i < 2; i++)
 	{
 		game->rotate(dir[i]);
-		int score = min(difficulty-1);
-		if(score > score_max)
-		{
-			score_max = score;
-			rotate = true;
+		int score = min_max(difficulty-1);
+		game->load_board(save, w, h, ai_id);
+
+		cout << "rot: " << score << endl;
+
+		if((rotate = change_score(score_max, score, true)))
 			direction = dir[i];
-		}
-		game->load_board(save, w, h);
 	}
 	Game::delete_board(save, h);
 
@@ -58,54 +58,62 @@ void AI::make_move()
 		game->make_move(col_max);
 }
 
-int AI::max(int depth)
+int AI::min_max(int depth)
 {
-	if((depth == 0) || game->done())
+	if((depth== 0) || game->done())
 		return evaluate(depth);
 	
-	int score_max = SCORE_MIN;
+	bool max = (game->get_current_player() == ai_id);
+	int score_m = (max) ? SCORE_MIN : SCORE_MAX;
 	for(int i = 0; i < game->get_width(); i++)
 	{
 		if(game->make_move(i))
 		{
-			int score = min(depth-1);
-
-			if(score > score_max)
-				score_max = score;
-
+			int score = min_max(depth-1);
 			game->cancel_move(i);
+			change_score(score_m, score, max);
 		}
 	}
-	
-	return score_max;
-}
 
-int AI::min(int depth)
-{
-	if((depth == 0) || game->done())
-		return evaluate(depth);
-	
-	int score_min = SCORE_MAX;
+	int h = game->get_height();
+	int w = game->get_width();
+	char **save = Game::create_board(w, h);
+	game->copy_board(save);
 
-	for(int i = 0; i < game->get_width(); i++)
+	int dir[2] = {LEFT, RIGHT};
+	for(int i = 0; i < 2; i++)
 	{
-		if(game->make_move(i))
-		{
-			int score = max(depth-1);
-
-			if(score < score_min)
-				score_min = score;
-			
-			game->cancel_move(i);
-		}
+		game->rotate(dir[i]);
+		int score = min_max(depth-1);
+		game->load_board(save, w, h, Game::other_player(game->get_current_player()));
+		change_score(score_m, score, max);
 	}
-
-	return score_min;
+	Game::delete_board(save, h);
+	
+	return score_m;
 }
 
-/*
-	TODO: verif si connect impossible
-*/
+bool AI::change_score(int &score_m, int score, bool max)
+{
+	if(max)
+	{
+		//TODO: ajouter aléatoire
+		if(score > score_m /*|| ((score == score_m) && Rand::rand())*/)
+			score_m = score;
+		else
+			return false;
+	}
+	else
+	{
+		//TODO: ajouter aléatoire
+		if(score < score_m /*|| ((score == score_m) && Rand::rand())*/)
+			score_m = score;
+		else
+			return false;
+	}
+
+	return true;
+}
 
 int AI::evaluate(int depth)
 {
@@ -114,8 +122,8 @@ int AI::evaluate(int depth)
 		if(game->tie())
 			return SCORE_TIE;
 
-		return (game->get_current_player() == game->other_player(ai_id))
-				? SCORE_MAX+depth+1 : SCORE_MIN-depth-1;
+		return (game->get_current_player() == player_id) ? SCORE_MAX+depth+1
+														 : SCORE_MIN-depth-1;
 	}
 
 	int score = 0;
@@ -123,6 +131,7 @@ int AI::evaluate(int depth)
 	score -= game->get_nb_connect(player_id)*SCORE_CONNECT;
 
 	eval_lines(score);
+	//eval_cols(score);
 
 	return score;
 }
@@ -160,7 +169,7 @@ int AI::score_possible_connect(int i, int j, int size, bool line)
 		return 0;
 
 	int score = SCORE_CONNECT-(connect_len-size);
-	return (game->get_current_player() == ai_id) ? score : -score;
+	return score;
 }
 
 void AI::eval_lines(int &score)
