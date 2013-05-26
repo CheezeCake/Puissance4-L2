@@ -98,14 +98,14 @@ bool AI::change_score(int &score_m, int score, bool max)
 {
 	if(max)
 	{
-		if(score > score_m || ((score == score_m) && Rand::rand()))
+		if(score > score_m || ((score == score_m) && Rand::rand_bool()))
 			score_m = score;
 		else
 			return false;
 	}
 	else
 	{
-		if(score < score_m || ((score == score_m) && Rand::rand()))
+		if(score < score_m || ((score == score_m) && Rand::rand_bool()))
 			score_m = score;
 		else
 			return false;
