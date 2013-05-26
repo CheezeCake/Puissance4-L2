@@ -14,7 +14,7 @@ AI::AI(Game *game, char ai_id, int difficulty)
 
 void AI::make_move()
 {
-	int score_max = SCORE_MIN;
+	int score_max = SCORE_MIN-difficulty-1;
 	int col_max = 0;
 	bool rotate = false;
 	int direction = LEFT;
@@ -64,7 +64,7 @@ int AI::min_max(int depth)
 		return evaluate(depth);
 	
 	bool max = (game->get_current_player() == ai_id);
-	int score_m = (max) ? SCORE_MIN : SCORE_MAX;
+	int score_m = (max) ? (SCORE_MIN-depth-1) : (SCORE_MAX+depth+1);
 	for(int i = 0; i < game->get_width(); i++)
 	{
 		if(game->make_move(i))
@@ -122,8 +122,8 @@ int AI::evaluate(int depth)
 		if(game->tie())
 			return SCORE_TIE;
 
-		return (game->get_current_player() == player_id) ? SCORE_MAX+depth+1
-														 : SCORE_MIN-depth-1;
+		return (game->get_current_player() == player_id) ? SCORE_MAX+depth
+														 : SCORE_MIN-depth;
 	}
 
 	int score = 0;
