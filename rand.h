@@ -8,7 +8,7 @@ public:
 	static bool rand();
 
 private:
-	void check_seed();
+	static void check_seed();
 	
 	static unsigned int count;
 };
