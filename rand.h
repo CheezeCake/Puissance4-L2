@@ -5,7 +5,7 @@ class Rand
 public:
 	//Rand();
 
-	static bool rand();
+	static bool rand_bool();
 
 private:
 	static void check_seed();

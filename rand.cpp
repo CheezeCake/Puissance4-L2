@@ -13,9 +13,10 @@ void Rand::check_seed()
 	}
 }
 
-bool Rand::rand()
+bool Rand::rand_bool()
 {
 	check_seed();
 	++count;
-	return (rand() < 0.5);
+
+	return (rand()%2);
 }
