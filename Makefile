@@ -1,25 +1,29 @@
-CC=g++
-CFLAGS=-O2 -W -Wall -pedantic
+CXX=g++
+CXXFLAGS=-O2 -W -Wall -pedantic
 LIBS=`pkg-config --libs sdl` -lSDL_image -lSDL_ttf
-SRC=$(wildcard *.cpp)
-OBJ=$(SRC:.cpp=.o)
+SRCDIR=src/
+OBJDIR=obj/
+SRC=$(wildcard $(SRCDIR)*.cpp)
+OBJ=$(patsubst $(SRCDIR)%.cpp,$(OBJDIR)%.o,$(SRC))
+INCLUDEDIR=include/
+BINDIR=bin/
 TARGET=Game
 
 all: $(TARGET)
 
 $(TARGET): $(OBJ)
-	$(CC) $^ -o bin/$@ $(LIBS)
+	$(CXX) $^ -o $(BINDIR)$@ $(LIBS)
 
-$(OBJ): %.o: %.cpp
-	$(CC) -c $^ $(CFLAGS)
+$(OBJDIR)%.o: $(SRCDIR)%.cpp
+	$(CXX) -c $^ -o $@ -I $(INCLUDEDIR) $(CXXFLAGS)
+
+.PHONY: clean mrproper run
 
 run: $(TARGET)
-	cd ./bin && ./$(TARGET)
-
-.PHONY: clean mrproper
+	cd $(BINDIR) && ./$(TARGET)
 
 clean:
-	@rm -rf *.o
+	@rm -f $(OBJDIR)*.o
 
 mrproper: clean
-	@rm -rf bin/$(TARGET)
+	@rm -f $(BINDIR)$(TARGET)
