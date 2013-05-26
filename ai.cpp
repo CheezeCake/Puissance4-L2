@@ -1,4 +1,5 @@
 #include <iostream>
+#include <algorithm>
 #include "ai.h"
 #include "rand.h"
 
@@ -14,7 +15,7 @@ AI::AI(Game *game, char ai_id, int difficulty)
 
 void AI::make_move()
 {
-	int score_max = SCORE_MIN-difficulty-1;
+	int score_max = SCORE_MIN-SCORE_MIN;
 	int col_max = 0;
 	bool rotate = false;
 	int direction = LEFT;
@@ -64,7 +65,7 @@ int AI::min_max(int depth)
 		return evaluate(depth);
 	
 	bool max = (game->get_current_player() == ai_id);
-	int score_m = (max) ? (SCORE_MIN-depth-1) : (SCORE_MAX+depth+1);
+	int score_m = (max) ? (SCORE_MIN-SCORE_MIN) : (SCORE_MAX+SCORE_MAX);
 	for(int i = 0; i < game->get_width(); i++)
 	{
 		if(game->make_move(i))
@@ -97,16 +98,14 @@ bool AI::change_score(int &score_m, int score, bool max)
 {
 	if(max)
 	{
-		//TODO: ajouter aléatoire
-		if(score > score_m /*|| ((score == score_m) && Rand::rand())*/)
+		if(score > score_m || ((score == score_m) && Rand::rand()))
 			score_m = score;
 		else
 			return false;
 	}
 	else
 	{
-		//TODO: ajouter aléatoire
-		if(score < score_m /*|| ((score == score_m) && Rand::rand())*/)
+		if(score < score_m || ((score == score_m) && Rand::rand()))
 			score_m = score;
 		else
 			return false;
@@ -122,8 +121,8 @@ int AI::evaluate(int depth)
 		if(game->tie())
 			return SCORE_TIE;
 
-		return (game->get_current_player() == player_id) ? SCORE_MAX+depth
-														 : SCORE_MIN-depth;
+		return (game->get_current_player() == player_id) ? SCORE_MAX+depth+1
+														 : SCORE_MIN-depth-1;
 	}
 
 	int score = 0;
@@ -131,7 +130,7 @@ int AI::evaluate(int depth)
 	score -= game->get_nb_connect(player_id)*SCORE_CONNECT;
 
 	eval_lines(score);
-	//eval_cols(score);
+	eval_cols(score);
 
 	return score;
 }
@@ -168,8 +167,7 @@ int AI::score_possible_connect(int i, int j, int size, bool line)
 	if(size+spaces_around < connect_len)
 		return 0;
 
-	int score = SCORE_CONNECT-(connect_len-size);
-	return score;
+	return size;
 }
 
 void AI::eval_lines(int &score)
@@ -197,7 +195,7 @@ void AI::eval_cols(int &score)
 	for(int i = 0; i < game->get_width(); i++)
 	{
 		int count = (game->get_value(0, i) == EMPTY) ? 0 : 1;
-		for(int j = 1; j < game->get_width(); j++)
+		for(int j = 1; j < game->get_height(); j++)
 		{
 			char current = game->get_value(j, i);
 
@@ -211,3 +209,4 @@ void AI::eval_cols(int &score)
 		}
 	}
 }
+

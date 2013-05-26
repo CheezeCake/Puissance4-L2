@@ -13,7 +13,10 @@ class AI
 {
 public:
 	AI(Game*, char, int);
-	
+
+	void make_move();
+
+private:
 	int evaluate(int);
 	void eval_lines(int&);
 	void eval_cols(int&);
@@ -21,11 +24,9 @@ public:
 	inline char get_value(int, int, bool);
 	int score_possible_connect(int, int, int, bool);
 
-	void make_move();
 	int min_max(int);
 	bool change_score(int&, int, bool);
 
-private:
 	Game *game;
 	char ai_id;
 	char player_id;
