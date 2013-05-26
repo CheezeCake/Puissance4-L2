@@ -118,14 +118,14 @@ void Gui::play_vs_ai(Game &g, int difficulty)
 
 	char player = g.get_current_player();
 	char player_ai = Game::other_player(player);
-	AI ai(player_ai, difficulty);
+	AI ai(&g, player_ai, difficulty);
 	
 	while(!done)
 	{
 		if(g.get_current_player() == player_ai)
 		{
 			cout << "Thinking...\n";
-			ai.make_move(g);
+			ai.make_move();
 			cout << "Done.\n";
 		}
 		else

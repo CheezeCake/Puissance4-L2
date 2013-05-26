@@ -24,7 +24,7 @@ public:
 	char get_value(int, int);
 	char get_current_player();
 	void copy_board(char**);
-	void load_board(char**);
+	void load_board(char**, int, int, char);
 
 	bool done();
 	

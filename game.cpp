@@ -42,16 +42,22 @@ void Game::delete_board(char **b, int h)
 
 void Game::copy_board(char **dest)
 {
-	for(int i = 0; i < width; i++)
-		for(int j = 0; j < height; j++)
+	for(int i = 0; i < height; i++)
+		for(int j = 0; j < width; j++)
 			dest[i][j] = board[i][j];
 }
 
-void Game::load_board(char **src)
+void Game::load_board(char **src, int w, int h, char player_id)
 {
-	for(int i = 0; i < width; i++)
-		for(int j = 0; j < height; j++)
+	current_player = player_id;
+	delete_board(board, height);
+	board = create_board(w, h);
+	height = h;
+	width = w;
+	for(int i = 0; i < height; i++)
+		for(int j = 0; j < width; j++)
 			board[i][j] = src[i][j];
+	check();
 }
 
 void Game::display_cli()
@@ -213,6 +219,7 @@ bool Game::done()
 void Game::check()
 {
 	connections[PLAYER_1] = connections[PLAYER_2] = 0;
+	winner = EMPTY;
 	if(check_lines() ||	check_columns() || 	check_diagonals1() ||
 	   check_diagonals2() || check_tie())
 		return;
