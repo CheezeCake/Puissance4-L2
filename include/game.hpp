@@ -2,7 +2,7 @@
 #define GAME_H
 
 #include <iostream>
-#include "config.h"
+#include "config.hpp"
 
 enum {LEFT, RIGHT};
 

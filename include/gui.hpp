@@ -1,5 +1,5 @@
 #include <SDL/SDL.h>
-#include "game.h"
+#include "game.hpp"
 
 class Gui
 {

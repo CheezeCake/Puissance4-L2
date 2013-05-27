@@ -1,8 +1,8 @@
 #ifndef AI_H
 #define AI_H
 
-#include "game.h"
-#include "config.h"
+#include "game.hpp"
+#include "config.hpp"
 
 const int SCORE_MAX = 1000000;
 const int SCORE_MIN = -1000000;
