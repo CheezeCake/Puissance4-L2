@@ -1,5 +1,5 @@
 #include <iostream>
-#include "textInput.h"
+#include "textInput.hpp"
 
 using namespace std;
 

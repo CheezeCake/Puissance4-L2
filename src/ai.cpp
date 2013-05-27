@@ -1,7 +1,7 @@
 #include <iostream>
 #include <algorithm>
-#include "ai.h"
-#include "rand.h"
+#include "ai.hpp"
+#include "rand.hpp"
 
 using namespace std;
 

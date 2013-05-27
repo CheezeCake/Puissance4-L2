@@ -2,11 +2,11 @@
 #include <SDL/SDL_ttf.h>
 #include <iostream>
 #include <cstdlib>
-#include "game.h"
-#include "gui.h"
-#include "button.h"
-#include "textInput.h"
-#include "config.h"
+#include "game.hpp"
+#include "gui.hpp"
+#include "button.hpp"
+#include "textInput.hpp"
+#include "config.hpp"
 
 using namespace std;
 

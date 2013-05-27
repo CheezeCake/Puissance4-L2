@@ -4,11 +4,11 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 #include <SDL/SDL_ttf.h>
-#include "gui.h"
-#include "button.h"
-#include "textInput.h"
-#include "ai.h"
-#include "config.h"
+#include "gui.hpp"
+#include "button.hpp"
+#include "textInput.hpp"
+#include "ai.hpp"
+#include "config.hpp"
 
 using namespace std;
 

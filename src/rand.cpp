@@ -1,6 +1,6 @@
 #include <cstdlib>
 #include <ctime>
-#include "rand.h"
+#include "rand.hpp"
 
 unsigned int Rand::count = 0;
 

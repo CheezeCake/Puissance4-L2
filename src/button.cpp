@@ -1,7 +1,7 @@
 #include <iostream>
 #include <SDL/SDL_image.h>
-#include "button.h"
-#include "config.h"
+#include "button.hpp"
+#include "config.hpp"
 
 using namespace std;
 
