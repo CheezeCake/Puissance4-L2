@@ -27,8 +27,6 @@ void AI::make_move()
 			int score = min(difficulty-1);
 			game->cancel_move(i);
 
-			//cout << score << endl;
-
 			if(change_score_max(score_max, score))
 				col_max = i;
 		}
@@ -45,8 +43,6 @@ void AI::make_move()
 		game->rotate(dir[i]);
 		int score = min(difficulty-1);
 		game->load_board(save, w, h, ai_id);
-
-		//cout << "rot: " << score << endl;
 
 		if((rotate = change_score_max(score_max, score)))
 			direction = dir[i];
@@ -160,8 +156,8 @@ int AI::evaluate(int depth)
 		if(game->tie())
 			return SCORE_TIE;
 
-		return (game->get_current_player() == ai_id) ? SCORE_MIN-depth-1
-													 : SCORE_MAX+depth+1;
+		return (game->get_winner_id() == ai_id) ? SCORE_MAX+depth+1
+												: SCORE_MIN-depth-1;
 	}
 
 	int score = 0;
@@ -222,7 +218,10 @@ void AI::eval_lines(int &score)
 				++count;
 			else if(count > 0)
 			{
-				score += score_possible_connect(i, j, count, true);
+				int s = score_possible_connect(i, j, count, true);
+				if(game->get_value(i, j-1) == player_id)
+					s = -s;
+				score += s;
 				count = 0;
 			}
 		}
@@ -242,7 +241,10 @@ void AI::eval_cols(int &score)
 				++count;
 			else if(count > 0)
 			{
-				score += score_possible_connect(i, j, count, false);
+				int s = score_possible_connect(i, j, count, false);
+				if(game->get_value(j-1, i) == player_id)
+					s = -s;
+				score += s;
 				count = 0;
 			}
 		}
