@@ -24,8 +24,10 @@ private:
 	inline char get_value(int, int, bool);
 	int score_possible_connect(int, int, int, bool);
 
-	int min_max(int);
-	bool change_score(int&, int, bool);
+	int min(int);
+	int max(int);
+	bool change_score_max(int&, int);
+	bool change_score_min(int&, int);
 
 	Game *game;
 	char ai_id;
