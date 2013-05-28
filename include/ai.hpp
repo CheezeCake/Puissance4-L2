@@ -13,6 +13,7 @@ class AI
 {
 public:
 	AI(Game*, char, int);
+	~AI();
 
 	void make_move();
 
@@ -30,6 +31,9 @@ private:
 	bool change_score_min(int&, int);
 
 	Game *game;
+	char **save;
+	int dim;
+
 	char ai_id;
 	char player_id;
 	int difficulty;

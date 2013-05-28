@@ -2,14 +2,19 @@
 #include <algorithm>
 #include "ai.hpp"
 
-using namespace std;
-
 AI::AI(Game *game, char ai_id, int difficulty)
 {
 	this->game = game;
 	this->difficulty = difficulty;
 	this->ai_id = ai_id;
-	player_id = Game::other_player(ai_id);
+	player_id = Game::other_player(ai_id);	
+	dim = std::max(game->get_width(), game->get_height());
+	save = Game::create_board(dim, dim*difficulty);
+}
+
+AI::~AI()
+{
+	Game::delete_board(save, dim);
 }
 
 void AI::make_move()
@@ -33,7 +38,6 @@ void AI::make_move()
 
 	int h = game->get_height();
 	int w = game->get_width();
-	char **save = Game::create_board(w, h);
 	game->copy_board(save);
 
 	int dir[2] = {LEFT, RIGHT};
@@ -46,7 +50,6 @@ void AI::make_move()
 		if((rotate = change_score_max(score_max, score)))
 			direction = dir[i];
 	}
-	Game::delete_board(save, h);
 
 	if(rotate)
 		game->rotate(direction);
@@ -77,26 +80,22 @@ int AI::min(int depth, int alpha)
 
 	int h = game->get_height();
 	int w = game->get_width();
-	char **save = Game::create_board(w, h);
-	game->copy_board(save);
+	int p = dim*(difficulty-depth);
+	game->copy_board(save+p);
 
 	int dir[2] = {LEFT, RIGHT};
 	for(int i = 0; i < 2; i++)
 	{
 		game->rotate(dir[i]);
 		int score = max(depth-1, score_min);
-		game->load_board(save, w, h, player_id);
+		game->load_board(save+p, w, h, player_id);
 		
 		if(score < alpha)
-		{
-			Game::delete_board(save, h);
 			return alpha;
-		}
 
 		if(change_score_min(score_min, score))
 			score_min = score;
 	}
-	Game::delete_board(save, h);
 
 	return score_min;
 }
@@ -125,26 +124,22 @@ int AI::max(int depth, int beta)
 
 	int h = game->get_height();
 	int w = game->get_width();
-	char **save = Game::create_board(w, h);
-	game->copy_board(save);
+	int p = dim*(difficulty-depth);
+	game->copy_board(save+p);
 
 	int dir[2] = {LEFT, RIGHT};
 	for(int i = 0; i < 2; i++)
 	{
 		game->rotate(dir[i]);
 		int score = min(depth-1, score_max);
-		game->load_board(save, w, h, ai_id);
-		
+		game->load_board(save+p, w, h, ai_id);
+
 		if(score > beta)
-		{
-			Game::delete_board(save, h);
 			return score;
-		}
 
 		if(change_score_max(score_max, score))
 			score_max = score;
 	}
-	Game::delete_board(save, h);
 
 	return score_max;
 }
