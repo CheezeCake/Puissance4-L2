@@ -88,7 +88,10 @@ int AI::min(int depth, int alpha)
 		game->load_board(save, w, h, player_id);
 		
 		if(score < alpha)
+		{
+			Game::delete_board(save, h);
 			return alpha;
+		}
 
 		if(change_score_min(score_min, score))
 			score_min = score;
@@ -133,7 +136,10 @@ int AI::max(int depth, int beta)
 		game->load_board(save, w, h, ai_id);
 		
 		if(score > beta)
+		{
+			Game::delete_board(save, h);
 			return score;
+		}
 
 		if(change_score_max(score_max, score))
 			score_max = score;
