@@ -1,7 +1,6 @@
 #include <iostream>
 #include <algorithm>
 #include "ai.hpp"
-#include "rand.hpp"
 
 using namespace std;
 
@@ -24,7 +23,7 @@ void AI::make_move()
 	{
 		if(game->make_move(i))
 		{
-			int score = min(difficulty-1);
+			int score = min(difficulty-1, score_max);
 			game->cancel_move(i);
 
 			if(change_score_max(score_max, score))
@@ -41,7 +40,7 @@ void AI::make_move()
 	for(int i = 0; i < 2; i++)
 	{
 		game->rotate(dir[i]);
-		int score = min(difficulty-1);
+		int score = min(difficulty-1, score_max);
 		game->load_board(save, w, h, ai_id);
 
 		if((rotate = change_score_max(score_max, score)))
@@ -55,7 +54,7 @@ void AI::make_move()
 		game->make_move(col_max);
 }
 
-int AI::min(int depth)
+int AI::min(int depth, int alpha)
 {
 	if((depth == 0) || game->done())
 		return evaluate(depth);
@@ -65,8 +64,12 @@ int AI::min(int depth)
 	{
 		if(game->make_move(i))
 		{
-			int score = max(depth-1);
+			int score = max(depth-1, score_min);
 			game->cancel_move(i);
+			
+			if(score < alpha)
+				return score;
+
 			if(change_score_min(score_min, score))
 				score_min = score;
 		}
@@ -81,17 +84,21 @@ int AI::min(int depth)
 	for(int i = 0; i < 2; i++)
 	{
 		game->rotate(dir[i]);
-		int score = max(depth-1);
+		int score = max(depth-1, score_min);
+		game->load_board(save, w, h, player_id);
+		
+		if(score < alpha)
+			return alpha;
+
 		if(change_score_min(score_min, score))
 			score_min = score;
-		game->load_board(save, w, h, player_id);
 	}
 	Game::delete_board(save, h);
 
 	return score_min;
 }
 
-int AI::max(int depth)
+int AI::max(int depth, int beta)
 {
 	if((depth == 0) || game->done())
 		return evaluate(depth);
@@ -101,8 +108,13 @@ int AI::max(int depth)
 	{
 		if(game->make_move(i))
 		{
-			int score = min(depth-1);
+			int score = min(depth-1, score_max);
 			game->cancel_move(i);
+
+
+			if(score > beta)
+				return score;
+
 			if(change_score_max(score_max, score))
 				score_max = score;
 		}
@@ -117,10 +129,14 @@ int AI::max(int depth)
 	for(int i = 0; i < 2; i++)
 	{
 		game->rotate(dir[i]);
-		int score = min(depth-1);
+		int score = min(depth-1, score_max);
+		game->load_board(save, w, h, ai_id);
+		
+		if(score > beta)
+			return score;
+
 		if(change_score_max(score_max, score))
 			score_max = score;
-		game->load_board(save, w, h, ai_id);
 	}
 	Game::delete_board(save, h);
 
@@ -129,7 +145,7 @@ int AI::max(int depth)
 
 bool AI::change_score_max(int &score_max, int score)
 {
-	if((score > score_max) || ((score == score_max) && Rand::rand_bool()))
+	if(score > score_max)
 	{
 		score_max = score;
 		return true;
@@ -140,7 +156,7 @@ bool AI::change_score_max(int &score_max, int score)
 
 bool AI::change_score_min(int &score_min, int score)
 {
-	if((score < score_min) || ((score == score_min) && Rand::rand_bool()))
+	if(score < score_min)
 	{
 		score_min = score;
 		return true;

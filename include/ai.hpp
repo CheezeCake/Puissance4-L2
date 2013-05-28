@@ -24,8 +24,8 @@ private:
 	inline char get_value(int, int, bool);
 	int score_possible_connect(int, int, int, bool);
 
-	int min(int);
-	int max(int);
+	int min(int, int);
+	int max(int, int);
 	bool change_score_max(int&, int);
 	bool change_score_min(int&, int);
 
