@@ -123,11 +123,7 @@ void Gui::play_vs_ai(Game &g, int difficulty)
 	while(!done)
 	{
 		if(g.get_current_player() == player_ai)
-		{
-			cout << "Thinking...\n";
 			ai.make_move();
-			cout << "Done.\n";
-		}
 		else
 		{
 			SDL_WaitEvent(&event);
