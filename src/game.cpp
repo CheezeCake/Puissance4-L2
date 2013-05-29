@@ -11,7 +11,6 @@ Game::Game(int width, int height, int connect_len, int nb_connect)
 	current_player = PLAYER_1;
 	winner = EMPTY;
 	connections[PLAYER_1] = connections[PLAYER_2] = 0;
-	std::cout<<PLAYER_1<<" "<<PLAYER_2<<" "<<EMPTY<<" "<<TIE<<"\n";
 }
 
 Game::~Game()
