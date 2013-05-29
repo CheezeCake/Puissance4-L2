@@ -8,6 +8,7 @@ Game::Game(int width, int height, int connect_len, int nb_connect)
 	this->width = width;
 	this->height = height;
 	board = create_board(width, height);
+	board1 = create_board(height, width);
 	current_player = PLAYER_1;
 	winner = EMPTY;
 	connections[PLAYER_1] = connections[PLAYER_2] = 0;
@@ -16,6 +17,7 @@ Game::Game(int width, int height, int connect_len, int nb_connect)
 Game::~Game()
 {
 	delete_board(board, height);
+	delete_board(board1, width);
 }
 
 char** Game::create_board(int width, int height)
@@ -47,15 +49,21 @@ void Game::copy_board(char **dest)
 
 void Game::load_board(char **src, int w, int h, char player_id)
 {
-	current_player = player_id;
-	delete_board(board, height);
-	board = create_board(w, h);
-	height = h;
-	width = w;
-	for(int i = 0; i < height; i++)
-		for(int j = 0; j < width; j++)
-			board[i][j] = src[i][j];
-	check();
+	if(w == height && h == width)
+	{
+
+		current_player = player_id;
+		char **tmp = board;
+		board = board1;
+		board1 = tmp;
+
+		height = h;
+		width = w;
+		for(int i = 0; i < height; i++)
+			for(int j = 0; j < width; j++)
+				board[i][j] = src[i][j];
+		check();
+	}
 }
 
 void Game::display_cli()
@@ -136,25 +144,25 @@ void Game::cancel_move(int j)
 
 void Game::rotate(int direction)
 {
-	char **new_board = new char*[width];
 	for(int i = 0; i < width; i++)
 	{
-		new_board[i] = new char[height];
+		board1[i] = new char[height];
 		for(int j = 0; j < height; j++)
 		{
 			if(direction == LEFT)
-				new_board[i][j] = board[j][width-i-1];
+				board1[i][j] = board[j][width-i-1];
 			else
-				new_board[i][j] = board[height-j-1][i];
+				board1[i][j] = board[height-j-1][i];
 		}
 	}
 
-	delete_board(board, height);
-	board = new_board;
+	char **tmp = board;
+	board = board1;
+	board1 = tmp;
 
-	int tmp = height;
+	int _tmp = height;
 	height = width;
-	width = tmp;
+	width = _tmp;
 
 	gravity();
 

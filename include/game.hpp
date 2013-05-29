@@ -56,6 +56,7 @@ private:
 	void check_tie();
 	
 	char **board;
+	char **board1;
 	int width;
 	int height;
 	int connect_len; //taille alignement
