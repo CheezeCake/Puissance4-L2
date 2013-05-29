@@ -73,8 +73,7 @@ int AI::min(int depth, int alpha)
 			if(score < alpha)
 				return score;
 
-			if(change_score_min(score_min, score))
-				score_min = score;
+			change_score_min(score_min, score)
 		}
 	}
 
@@ -93,8 +92,7 @@ int AI::min(int depth, int alpha)
 		if(score < alpha)
 			return alpha;
 
-		if(change_score_min(score_min, score))
-			score_min = score;
+		change_score_min(score_min, score)
 	}
 
 	return score_min;
