@@ -328,7 +328,7 @@ void Game::check_diagonals1()
 
 void Game::check_diagonals2()
 {
-	int z = std::min(width < height);
+	int z = std::min(width, height);
 	if(z < connect_len)
 		return;
 	
