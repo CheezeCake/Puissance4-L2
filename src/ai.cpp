@@ -73,7 +73,7 @@ int AI::min(int depth, int alpha)
 			if(score < alpha)
 				return score;
 
-			change_score_min(score_min, score)
+			change_score_min(score_min, score);
 		}
 	}
 
@@ -92,7 +92,7 @@ int AI::min(int depth, int alpha)
 		if(score < alpha)
 			return alpha;
 
-		change_score_min(score_min, score)
+		change_score_min(score_min, score);
 	}
 
 	return score_min;
@@ -115,8 +115,7 @@ int AI::max(int depth, int beta)
 			if(score > beta)
 				return score;
 
-			if(change_score_max(score_max, score))
-				score_max = score;
+			change_score_max(score_max, score);
 		}
 	}
 
@@ -135,14 +134,13 @@ int AI::max(int depth, int beta)
 		if(score > beta)
 			return score;
 
-		if(change_score_max(score_max, score))
-			score_max = score;
+		change_score_max(score_max, score);
 	}
 
 	return score_max;
 }
 
-bool AI::change_score_max(int &score_max, int score)
+inline bool AI::change_score_max(int &score_max, int score)
 {
 	if(score > score_max)
 	{
@@ -153,7 +151,7 @@ bool AI::change_score_max(int &score_max, int score)
 	return false;
 }
 
-bool AI::change_score_min(int &score_min, int score)
+inline bool AI::change_score_min(int &score_min, int score)
 {
 	if(score < score_min)
 	{
@@ -172,7 +170,7 @@ int AI::evaluate(int depth)
 			return SCORE_TIE;
 
 		return (game->get_winner_id() == ai_id) ? SCORE_MAX+depth+1
-												: SCORE_MIN-depth-1;
+		                                        : SCORE_MIN-depth-1;
 	}
 
 	int score = 0;

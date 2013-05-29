@@ -27,8 +27,8 @@ private:
 
 	int min(int, int);
 	int max(int, int);
-	bool change_score_max(int&, int);
-	bool change_score_min(int&, int);
+	inline bool change_score_max(int&, int);
+	inline bool change_score_min(int&, int);
 
 	Game *game;
 	char **save;

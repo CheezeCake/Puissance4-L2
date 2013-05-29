@@ -3,8 +3,6 @@
 #include "button.hpp"
 #include "config.hpp"
 
-using namespace std;
-
 Button::Button(char *path)
 {
 	surface = NULL;
@@ -12,7 +10,7 @@ Button::Button(char *path)
 
 	if(surface == NULL)
 	{
-		cerr << "Impossible de charger: " << path << endl;
+		std::cerr << "Impossible de charger: " << path << std::endl;
 		exit(1);
 	}
 

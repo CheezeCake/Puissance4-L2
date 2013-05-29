@@ -1,8 +1,6 @@
 #include <iostream>
 #include "game.hpp"
 
-using namespace std;
-
 Game::Game(int width, int height, int connect_len, int nb_connect)
 {
 	this->nb_connect = nb_connect;
@@ -65,26 +63,26 @@ void Game::display_cli()
 	for(int i = 0; i < height; i++)
 	{
 		for(int j = 0; j < width; j++)
-			cout << " ___";
-		cout << "\n";
+			std::cout << " ___";
+		std::cout << "\n";
 
-		cout << "|";
+		std::cout << "|";
 		for(int j = 0; j < width; j++)
 		{
 			if(board[i][j] == PLAYER_1)
-				cout << " X ";
+				std::cout << " X ";
 			else if(board[i][j] == PLAYER_2)
-				cout << " O ";
+				std::cout << " O ";
 			else
-				cout << "   ";
-			cout << "|";
+				std::cout << "   ";
+			std::cout << "|";
 		}
-		cout << "\n";
+		std::cout << "\n";
 	}
 
 	for(int i = 0; i < width; i++)
-		cout << " ___";
-	cout << "\n";
+		std::cout << " ___";
+	std::cout << "\n";
 }
 
 char Game::get_value(int i, int j)
@@ -115,7 +113,6 @@ bool Game::make_move(int col)
 	board[0][col] = current_player;
 	alternate_player();
 	gravity_on_col(col);
-
 
 	check(); //set winner
 
@@ -375,7 +372,7 @@ bool Game::check_diagonals2()
 	return false;
 }
 
-string Game::get_winner()
+std::string Game::get_winner()
 {
 	//partie non finie
 	if(winner == EMPTY)

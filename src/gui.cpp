@@ -17,7 +17,7 @@ Gui::Gui(int width, int height)
 	size = (width > height) ? width : height;
 
 	screen = SDL_SetVideoMode(size*SPRITE_WIDTH, size*SPRITE_HEIGHT,
-							  BPP, SDL_HWSURFACE);
+	                          BPP, SDL_HWSURFACE);
 		
 	if(screen == NULL)
 	{
