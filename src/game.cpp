@@ -11,6 +11,7 @@ Game::Game(int width, int height, int connect_len, int nb_connect)
 	current_player = PLAYER_1;
 	winner = EMPTY;
 	connections[PLAYER_1] = connections[PLAYER_2] = 0;
+	std::cout<<PLAYER_1<<" "<<PLAYER_2<<" "<<EMPTY<<" "<<TIE<<"\n";
 }
 
 Game::~Game()
@@ -131,7 +132,6 @@ void Game::cancel_move(int j)
 	board[i][j] = EMPTY;
 
 	alternate_player();
-	winner = EMPTY;
 	check();
 }
 
@@ -198,14 +198,18 @@ bool Game::tie()
 	return (winner == TIE);
 }
 
-bool Game::check_tie()
+void Game::check_tie()
 {
+	//deja trouve le même nombre (gagnant) d'alignements
+	//pour les deux en même temps
+	if(winner == TIE)
+		return;
+
 	for(int i = 0; i < width; i++)
 		if(board[0][i] == EMPTY)
-			return false;
+			return;
 	
 	winner = TIE;
-	return true;
 }
 
 bool Game::done()
@@ -217,12 +221,15 @@ void Game::check()
 {
 	connections[PLAYER_1] = connections[PLAYER_2] = 0;
 	winner = EMPTY;
-	if(check_lines() ||	check_columns() || 	check_diagonals1() ||
-	   check_diagonals2() || check_tie())
-		return;
+
+	check_lines();
+	check_columns();
+	check_diagonals1();
+	check_diagonals2();
+	check_tie();
 }
 
-bool Game::update_count(char previous, char current, int &count)
+void Game::update_count(char previous, char current, int &count)
 {
 	if(current == EMPTY)
 		count = 0;
@@ -239,17 +246,18 @@ bool Game::update_count(char previous, char current, int &count)
 
 	if(connections[(int)current] == nb_connect)
 	{
-		winner = current;
-		return true;
+		if(winner == EMPTY)
+			winner = current;
+		else if(winner != current)
+			winner = TIE;
 	}
 
-	return false;
 }
 
-bool Game::check_lines()
+void Game::check_lines()
 {
 	if(width < connect_len)
-		return false;
+		return;
 
 	for(int i = height-1; i >= 0; i--)
 	{
@@ -259,18 +267,15 @@ bool Game::check_lines()
 			char previous = board[i][j-1];
 			char current = board[i][j];
 			
-			if(update_count(previous, current, count))
-				return true;
+			update_count(previous, current, count);
 		}
 	}
-
-	return false;
 }
 
-bool Game::check_columns()
+void Game::check_columns()
 {
 	if(height < connect_len)
-		return false;
+		return;
 
 	for(int i = 0; i < width; i++)
 	{
@@ -280,19 +285,16 @@ bool Game::check_columns()
 			char previous = board[j+1][i];
 			char current = board[j][i];
 
-			if(update_count(previous, current, count))
-				return true;
+			update_count(previous, current, count);
 		}
 	}
-
-	return false;
 }
 
-bool Game::check_diagonals1()
+void Game::check_diagonals1()
 {
-	int z = (width < height) ? width : height;
+	int z = std::min(width, height);
 	if(z < connect_len)
-		return false;
+		return;
 	
 	//diagonales bg -> hd
 	for(int i = 0; (i < width) && (width-i >= connect_len); i++)
@@ -304,9 +306,7 @@ bool Game::check_diagonals1()
 			char previous = board[start-j+1][i+j-1];
 			char current = board[start-j][i+j];
 			
-			if(update_count(previous, current, count))
-				return true;
-
+			update_count(previous, current, count);
 			++j;
 		}
 	}
@@ -320,21 +320,17 @@ bool Game::check_diagonals1()
 			char previous = board[i-j+1][start+j-1];
 			char current = board[i-j][start+j];
 			
-			if(update_count(previous, current, count))
-				return true;
-
+			update_count(previous, current, count);
 			++j;
 		}
 	}
-
-	return false;
 }
 
-bool Game::check_diagonals2()
+void Game::check_diagonals2()
 {
-	int z = (width < height) ? width : height;
+	int z = std::min(width < height);
 	if(z < connect_len)
-		return false;
+		return;
 	
 	//diagonales bd -> hg
 	for(int i = width-1; (i >= 0) && (i+1 >= connect_len); i--)
@@ -346,9 +342,7 @@ bool Game::check_diagonals2()
 			char previous = board[start-j+1][i-j+1];
 			char current = board[start-j][i-j];
 			
-			if(update_count(previous, current, count))
-				return true;
-
+			update_count(previous, current, count);
 			++j;
 		}
 	}
@@ -362,21 +356,17 @@ bool Game::check_diagonals2()
 			char previous = board[i-j+1][start-j+1];
 			char current = board[i-j][start-j];
 
-			if(update_count(previous, current, count))
-				return true;
-
+			update_count(previous, current, count);
 			++j;
 		}
 	}
-
-	return false;
 }
 
 std::string Game::get_winner()
 {
 	//partie non finie
 	if(winner == EMPTY)
-		return "";
+		return "Partie en cours";
 
 	//ex-aequo	
 	if(tie())
@@ -385,7 +375,7 @@ std::string Game::get_winner()
 	return (winner == PLAYER_1) ? "Joueur 1" : "Joueur 2";
 }
 
-int Game::get_winner_id()
+char Game::get_winner_id()
 {
 	return winner;
 }

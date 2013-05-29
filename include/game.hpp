@@ -30,7 +30,7 @@ public:
 	
 	bool tie();
 	std::string get_winner();
-	int get_winner_id();
+	char get_winner_id();
 	
 	int get_width();
 	int get_height();
@@ -44,16 +44,16 @@ public:
 
 private:
 	void alternate_player();
-	void gravity();
+	inline void gravity();
 	void gravity_on_col(int);
 	
 	void check();
-	bool update_count(char, char, int&);
-	bool check_lines();
-	bool check_columns();	
-	bool check_diagonals1();
-	bool check_diagonals2();
-	bool check_tie();
+	void update_count(char, char, int&);
+	void check_lines();
+	void check_columns();
+	void check_diagonals1();
+	void check_diagonals2();
+	void check_tie();
 	
 	char **board;
 	int width;
@@ -63,7 +63,7 @@ private:
 	
 	char current_player;
 	int connections[2];
-	int winner;
+	char winner;
 };
 
 #endif
