@@ -22,7 +22,7 @@ Gui::Gui(int width, int height)
 	if(screen == NULL)
 	{
 		cerr << "Erreur initialisation affichage (" 
-			 << SDL_GetError() << ")" << endl;
+		     << SDL_GetError() << ")" << endl;
 		exit(1);
 	}
 
@@ -164,8 +164,7 @@ int Gui::ask_difficulty(SDL_Surface *screen)
 {
 	TTF_Font *font = TTF_OpenFont((char*)"fonts/arial.ttf", HEIGHT/20);
 	SDL_Color color = {255, 255, 255, 0};
-	SDL_Surface *tile = TTF_RenderText_Blended(font, (char*)"difficulte",
-											   color);
+	SDL_Surface *tile = TTF_RenderText_Blended(font, (char*)"difficulte", color);
 	SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
 	
 	Button easy((char*)"images/button_easy.png");
@@ -217,7 +216,7 @@ int Gui::ask_value(SDL_Surface *screen, char *name, int def)
 
 	SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
 	TextInput input(WIDTH/2, HEIGHT/20, 4, (char*)"fonts/arial.ttf",
-					WIDTH/4, HEIGHT/2-HEIGHT/10);
+	                WIDTH/4, HEIGHT/2-HEIGHT/10);
 
 	SDL_Event event;	
 	SDL_Rect pos;
@@ -250,7 +249,7 @@ int Gui::ask_value(SDL_Surface *screen, char *name, int def)
 }
 
 void Gui::ask_game_dimensions(SDL_Surface *screen, int &width, int &height, int &connect_len,
-							  int &nb_connect)
+                              int &nb_connect)
 {
 	width = ask_value(screen, (char*)"Largeur", 7);
 	height = ask_value(screen, (char*)"Hauteur", 6);

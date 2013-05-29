@@ -17,7 +17,7 @@ TextInput::TextInput(int width, int height, unsigned int limit, char* font_path,
 	if(background == NULL)
 	{
 		cerr << "TextInput: Erreur lors de la creation d'une SDL_Surface (" 
-			 << SDL_GetError() << ")\n";
+		     << SDL_GetError() << ")\n";
 		exit(1);
 	}
 
@@ -28,7 +28,7 @@ TextInput::TextInput(int width, int height, unsigned int limit, char* font_path,
 	if(font == NULL)
 	{
 		cerr << "TextInput: Erreur lors du chargement de la police ("
-			 << font_path << ")\n";
+		     << font_path << ")\n";
 		exit(1);
 	}
 }
@@ -79,7 +79,7 @@ void TextInput::capture_text(SDL_Surface *screen)
 			else if((event.key.keysym.sym == SDLK_BACKSPACE) && (text.size() > 0))
 				text.erase(text.end()-1);
 			else if((event.key.keysym.unicode >= 33) && 
-					(event.key.keysym.unicode <= 126) && ((int)text.size() <= limit))
+			        (event.key.keysym.unicode <= 126) && ((int)text.size() <= limit))
 				text.push_back((char)event.key.keysym.unicode);
 		}
 
