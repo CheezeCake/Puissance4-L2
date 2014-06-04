@@ -9,7 +9,7 @@ class TextInput
 {
 public:
 	TextInput(int width, int height, unsigned int limit, char* font_path,
-			  int x = 0, int y = 0);
+			int x = 0, int y = 0);
 	~TextInput();
 
 	void set_xy(int, int);

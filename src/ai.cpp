@@ -7,7 +7,7 @@ AI::AI(Game *game, char ai_id, int difficulty)
 	this->game = game;
 	this->difficulty = difficulty;
 	this->ai_id = ai_id;
-	player_id = Game::other_player(ai_id);	
+	player_id = Game::other_player(ai_id);
 	dim = std::max(game->get_width(), game->get_height());
 	save = Game::create_board(dim, dim*difficulty);
 }
@@ -61,7 +61,7 @@ int AI::min(int depth, int alpha)
 {
 	if((depth == 0) || game->done())
 		return evaluate(depth);
-	
+
 	int score_min = SCORE_MAX+difficulty;
 	for(int i = 0; i < game->get_width(); i++)
 	{
@@ -69,7 +69,7 @@ int AI::min(int depth, int alpha)
 		{
 			int score = max(depth-1, score_min);
 			game->cancel_move(i);
-			
+
 			if(score < alpha)
 				return score;
 
@@ -88,7 +88,7 @@ int AI::min(int depth, int alpha)
 		game->rotate(dir[i]);
 		int score = max(depth-1, score_min);
 		game->load_board(save+p, w, h, player_id);
-		
+
 		if(score < alpha)
 			return alpha;
 
@@ -102,7 +102,7 @@ int AI::max(int depth, int beta)
 {
 	if((depth == 0) || game->done())
 		return evaluate(depth);
-	
+
 	int score_max = SCORE_MIN-difficulty;
 	for(int i = 0; i < game->get_width(); i++)
 	{
@@ -169,8 +169,7 @@ int AI::evaluate(int depth)
 		if(game->tie())
 			return SCORE_TIE;
 
-		return (game->get_winner_id() == ai_id) ? SCORE_MAX+depth+1
-		                                        : SCORE_MIN-depth-1;
+		return (game->get_winner_id() == ai_id) ? SCORE_MAX+depth+1 : SCORE_MIN-depth-1;
 	}
 
 	int score = 0;

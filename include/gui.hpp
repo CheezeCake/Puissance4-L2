@@ -18,7 +18,7 @@ public:
 private:
 	void display_board(Game&);
 
-	int size;	
+	int size;
 	SDL_Surface *screen;
 	SDL_Surface **sprites;
 };

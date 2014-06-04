@@ -117,7 +117,7 @@ bool Game::make_move(int col)
 {
 	if(board[0][col] != EMPTY)
 		return false;
-	
+
 	board[0][col] = current_player;
 	alternate_player();
 	gravity_on_col(col);
@@ -132,7 +132,7 @@ void Game::cancel_move(int j)
 	int i = 0;
 	while((board[i][j] == EMPTY) && (i < height))
 		++i;
-	
+
 	if(i == height)
 		return;
 
@@ -183,7 +183,7 @@ void Game::gravity_on_col(int col)
 	{
 		bool fall;
 		int k = i;
-		
+
 		do
 		{
 			if((board[k][col] != EMPTY) && (board[k+1][col] == EMPTY))
@@ -215,7 +215,7 @@ void Game::check_tie()
 	for(int i = 0; i < width; i++)
 		if(board[0][i] == EMPTY)
 			return;
-	
+
 	winner = TIE;
 }
 
@@ -273,7 +273,7 @@ void Game::check_lines()
 		{
 			char previous = board[i][j-1];
 			char current = board[i][j];
-			
+
 			update_count(previous, current, count);
 		}
 	}
@@ -302,7 +302,7 @@ void Game::check_diagonals1()
 	int z = std::min(width, height);
 	if(z < connect_len)
 		return;
-	
+
 	//diagonales bg -> hd
 	for(int i = 0; (i < width) && (width-i >= connect_len); i++)
 	{
@@ -312,12 +312,12 @@ void Game::check_diagonals1()
 		{
 			char previous = board[start-j+1][i+j-1];
 			char current = board[start-j][i+j];
-			
+
 			update_count(previous, current, count);
 			++j;
 		}
 	}
-	
+
 	for(int i = height-2; (i >= 0) && (i+1 >= connect_len); i--)
 	{
 		int start = 0;
@@ -326,7 +326,7 @@ void Game::check_diagonals1()
 		{
 			char previous = board[i-j+1][start+j-1];
 			char current = board[i-j][start+j];
-			
+
 			update_count(previous, current, count);
 			++j;
 		}
@@ -338,7 +338,7 @@ void Game::check_diagonals2()
 	int z = std::min(width, height);
 	if(z < connect_len)
 		return;
-	
+
 	//diagonales bd -> hg
 	for(int i = width-1; (i >= 0) && (i+1 >= connect_len); i--)
 	{
@@ -348,12 +348,12 @@ void Game::check_diagonals2()
 		{
 			char previous = board[start-j+1][i-j+1];
 			char current = board[start-j][i-j];
-			
+
 			update_count(previous, current, count);
 			++j;
 		}
 	}
-	
+
 	for(int i = height-2; (i >= 0) && (i+1 >= connect_len); i--)
 	{
 		int start = width-1;
@@ -375,10 +375,10 @@ std::string Game::get_winner()
 	if(winner == EMPTY)
 		return "Partie en cours";
 
-	//ex-aequo	
+	//ex-aequo
 	if(tie())
 		return "Egalite";
-	
+
 	return (winner == PLAYER_1) ? "Joueur 1" : "Joueur 2";
 }
 

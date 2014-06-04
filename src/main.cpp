@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 	one.set_xy(WIDTH/3, HEIGHT/10);
 	Button vs_ai((char*)"images/button_vs_ia.png");
 	vs_ai.set_xy(WIDTH/3, HEIGHT/3);
-	
+
 
 	while(!done)
 	{
@@ -45,17 +45,17 @@ int main(int argc, char **argv)
 
 				Game game(width, height, connect_len, nb_connect);
 				Gui gui(width, height);
-				
+
 				gui.play(game);
 				gui.winner(game);
-				
+
 				screen = setup_new_screen();
 			}
 			else if(vs_ai.is_clicked(event.button.x, event.button.y))
 			{
 				Gui::ask_game_dimensions(screen, width, height, connect_len, nb_connect);
 				int difficulty = Gui::ask_difficulty(screen);
-				
+
 				if(difficulty != -1)
 				{
 					Game game(width, height, connect_len, nb_connect);
@@ -69,11 +69,11 @@ int main(int argc, char **argv)
 					done = true;
 			}
 		}
-		
-		SDL_PollEvent(&event);	
+
+		SDL_PollEvent(&event);
 		if(event.type == SDL_QUIT)
 			done = true;
-		
+
 
 		SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
 		one.display(screen);
@@ -81,10 +81,10 @@ int main(int argc, char **argv)
 
 		SDL_Flip(screen);
 	}
-	
+
 	SDL_Quit();
 	TTF_Quit();
-					
+
 	return 0;
 }
 

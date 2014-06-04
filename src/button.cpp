@@ -50,7 +50,7 @@ void Button::set_xy(int x, int y)
 bool Button::is_clicked(int x, int y)
 {
 	return ((x >= this->x) && (x <= this->x+surface->w) &&
-	        (y >= this->y) && (y <= this->y+surface->h));
+			(y >= this->y) && (y <= this->y+surface->h));
 }
 
 int Button::get_width()
