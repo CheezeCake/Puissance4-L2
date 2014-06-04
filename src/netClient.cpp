@@ -74,8 +74,5 @@ bool NetClient::send_move(const Move &move)
 
 	print_move("sent: ", move);
 
-	close(sock);
-	sock = -1;
-
 	return true;
 }
