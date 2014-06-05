@@ -87,17 +87,26 @@ int main(int argc, char **argv)
 				Game game(width, height, connect_len, nb_connect);
 				Gui gui(width, height);
 
+				SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+				SDL_Flip(screen);
+				std::cout << "Waiting for incoming connection..." << '\n';
 
 				NetHost host(listen_port);
-				host.send_game_dimensions(width, height, connect_len, nb_connect);
+				while(!host.send_game_dimensions(width, height, connect_len, nb_connect)
+						&& !done)
+				{
+					SDL_PollEvent(&event);
+					if(event.type == SDL_QUIT)
+						done = true;
+				}
 
-				/*
+				if(!done)
+				{
+					gui.play_net(game, host, Game::other_player(game.get_current_player()));
+					gui.winner(game);
 
-				gui.play_net(game, host);
-				gui.winner(game);
-
-				screen = setup_new_screen();
-				*/
+					screen = setup_new_screen();
+				}
 			}
 			else if(net_client.is_clicked(event.button.x, event.button.y))
 			{
@@ -109,19 +118,29 @@ int main(int argc, char **argv)
 				host_in.sin_port = htons(6666);
 				inet_pton(PF_INET, "127.0.0.1", &host_in.sin_addr);
 
+				SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+				SDL_Flip(screen);
+				std::cout << "Connecting to host..." << '\n';
+
 				NetClient client(host_in);
-				client.receive_game_dimensions(width, height, connect_len, nb_connect);
+				while(!client.receive_game_dimensions(width, height, connect_len, nb_connect)
+						&& !done)
+				{
+					SDL_PollEvent(&event);
+					if(event.type == SDL_QUIT)
+						done = true;
+				}
 
-				Game game(width, height, connect_len, nb_connect);
-				Gui gui(width, height);
+				if(!done)
+				{
+					Game game(width, height, connect_len, nb_connect);
+					Gui gui(width, height);
 
-				/*
+					gui.play_net(game, client, game.get_current_player());
+					gui.winner(game);
 
-				gui.play_net(game, client);
-				gui.winner(game);
-
-				screen = setup_new_screen();
-				*/
+					screen = setup_new_screen();
+				}
 			}
 		}
 		

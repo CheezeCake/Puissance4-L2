@@ -160,27 +160,96 @@ void Gui::play_vs_ai(Game &g, int difficulty)
 	}
 }
 
+void Gui::play_net(Game &g, Net &n, char player_id)
+{
+	bool done = false;
+	SDL_Event event;
+	Move move;
+
+	while(!done)
+	{
+		SDL_WaitEvent(&event);
+
+		if(event.type == SDL_QUIT)
+		{
+			done = true;
+			//on replace l'evènement dans la file
+			SDL_PushEvent(&event);
+		}
+
+		if(g.get_current_player() != player_id)
+		{
+			if(n.poll_reply(move))
+			{
+				if(move.type == ROTATION)
+					g.rotate(move.column);
+				else
+					g.make_move(move.column);
+			}
+		}
+		else
+		{
+			if(event.type == SDL_MOUSEBUTTONUP)
+			{
+				if(event.button.button == SDL_BUTTON_LEFT)
+				{
+					move.type = INSERTION;
+					move.column = (event.button.x/SPRITE_WIDTH)-(size-g.get_width())/2;
+
+					g.make_move(move.column);
+					n.send_move(move);
+				}
+			}
+			else if(event.type == SDL_KEYUP)
+			{
+				int way = -1;
+				if(event.key.keysym.sym == SDLK_RIGHT)
+					way = RIGHT;
+				else if(event.key.keysym.sym == SDLK_LEFT)
+					way = LEFT;
+
+				if(way != -1)
+				{
+					move.type = ROTATION;
+					move.column = way;
+
+					g.rotate(way);
+					n.send_move(move);
+				}
+			}
+		}
+
+		if(g.done())
+			done = true;
+
+		SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+		display_board(g);
+
+		SDL_Flip(screen);
+	}
+}
+
 int Gui::ask_difficulty(SDL_Surface *screen)
 {
 	TTF_Font *font = TTF_OpenFont((char*)"fonts/arial.ttf", HEIGHT/20);
 	SDL_Color color = {255, 255, 255, 0};
 	SDL_Surface *tile = TTF_RenderText_Blended(font, (char*)"difficulte", color);
 	SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
-	
+
 	Button easy((char*)"images/button_easy.png");
 	easy.set_xy(WIDTH/2-easy.get_width()/2, HEIGHT/7);
 	Button normal((char*)"images/button_normal.png");
 	normal.set_xy(easy.get_x(), easy.get_y()+(easy.get_height()*1.5));
 	Button hard((char*)"images/button_hard.png");
 	hard.set_xy(easy.get_x(), normal.get_y()+(normal.get_height()*1.5));
-	
+
 	bool done = false;
 	SDL_Event event;
 	SDL_Rect pos;
 	pos.x = WIDTH/2-tile->w/2;
 	pos.y = HEIGHT/20;
 	SDL_BlitSurface(tile, NULL, screen, &pos);
-	
+
 	while(!done)
 	{
 		SDL_WaitEvent(&event);
@@ -216,32 +285,34 @@ int Gui::ask_value(SDL_Surface *screen, char *name, int def)
 
 	SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
 	TextInput input(WIDTH/2, HEIGHT/20, 4, (char*)"fonts/arial.ttf",
-	                WIDTH/4, HEIGHT/2-HEIGHT/10);
+			WIDTH/4, HEIGHT/2-HEIGHT/10);
 
 	SDL_Event event;	
 	SDL_Rect pos;
 	pos.x = WIDTH/2-title->w/2;
 	pos.y = HEIGHT/20;
 	SDL_BlitSurface(title, NULL, screen, &pos);
-	
+
 	if(def != -1)
 	{
 		ostringstream oss;
 		oss << def;
 		input.set_text(oss.str());
 	}
-	
+
 	int value;	
 	do
 	{	
 		input.capture_text(screen);
 		value = atoi(input.get_text().c_str());
 		SDL_PollEvent(&event);
+		/*
 		if(event.type == SDL_QUIT)
 			exit(0);
+			*/
 		input.reset();
 	} while(value <= 0);
-	
+
 	SDL_FreeSurface(title);
 	TTF_CloseFont(font);
 
@@ -249,7 +320,7 @@ int Gui::ask_value(SDL_Surface *screen, char *name, int def)
 }
 
 void Gui::ask_game_dimensions(SDL_Surface *screen, int &width, int &height, int &connect_len,
-                              int &nb_connect)
+		int &nb_connect)
 {
 	width = ask_value(screen, (char*)"Largeur", 7);
 	height = ask_value(screen, (char*)"Hauteur", 6);
@@ -260,33 +331,33 @@ void Gui::ask_game_dimensions(SDL_Surface *screen, int &width, int &height, int 
 void Gui::winner(Game &game)
 {
 	string winner = game.get_winner();
-	
+
 	if(winner.empty())
 		return;
-	
+
 	SDL_Event event;
 	SDL_Rect pos;
 	SDL_Surface *surface = NULL;
 	TTF_Font *font = TTF_OpenFont((char*)"fonts/arial.ttf", screen->h/20);
 	SDL_Color color = {255, 0, 255, 0};
-	
+
 	if(!game.tie())
 		winner += " a gagne !";
 
 	surface = TTF_RenderText_Blended(font, winner.c_str(), color);
 	SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
 	display_board(game);
-	
+
 	pos.x = screen->w/2-surface->w/2;
 	pos.y = screen->h/2-surface->h/2;
 	SDL_BlitSurface(surface, NULL, screen, &pos);
-	
+
 	SDL_Flip(screen);
-		
+
 	do
 	{
 		SDL_WaitEvent(&event);
-	
+
 		if(event.type == SDL_QUIT)
 		{
 			SDL_PushEvent(&event);

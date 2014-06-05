@@ -64,6 +64,7 @@ bool NetHost::poll_reply(Move &move)
 		return false;
 
 	fd_set read_fd;
+	FD_ZERO(&read_fd);
 	FD_SET(sock, &read_fd);
 
 	if(select(sock+1, &read_fd, NULL, NULL, NULL) == -1)
@@ -91,9 +92,11 @@ bool NetHost::poll_reply(Move &move)
 		}
 
 		print_move("received: ", move);
+
+		return true;
 	}
 
-	return true;
+	return false;
 }
 
 bool NetHost::send_move(const Move &move)
@@ -126,6 +129,7 @@ bool NetHost::send_game_dimensions(int width, int height, int connect_len, int n
 		return false;
 
 	fd_set read_fd;
+	FD_ZERO(&read_fd);
 	FD_SET(sock, &read_fd);
 
 	if(select(sock+1, &read_fd, NULL, NULL, NULL) == -1)

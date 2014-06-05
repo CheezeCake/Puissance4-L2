@@ -30,6 +30,7 @@ bool NetClient::poll_reply(Move &move)
 		return false;
 
 	fd_set read_fd;
+	FD_ZERO(&read_fd);
 	FD_SET(sock, &read_fd);
 
 	if(select(sock+1, &read_fd, NULL, NULL, NULL) == -1)
@@ -55,9 +56,11 @@ bool NetClient::poll_reply(Move &move)
 		shutdown(sock, SHUT_RDWR);
 		close(sock);
 		sock = -1;
+
+		return true;
 	}
 
-	return true;
+	return false;
 }
 
 bool NetClient::send_move(const Move &move)
@@ -87,7 +90,7 @@ bool NetClient::send_move(const Move &move)
 	return true;
 }
 
-void NetClient::receive_game_dimensions(int &width, int &height, int &connect_len, int &nb_connect)
+bool NetClient::receive_game_dimensions(int &width, int &height, int &connect_len, int &nb_connect)
 {
 	int infos[4] = {0};
 
@@ -99,8 +102,10 @@ void NetClient::receive_game_dimensions(int &width, int &height, int &connect_le
 
 	if(connect(sock, (sockaddr*)&host, sizeof(host)) == -1)
 	{
-		perror("Connect");
-		exit(3);
+		shutdown(sock, SHUT_RDWR);
+		close(sock);
+		sock = -1;
+		return false;
 	}
 
 	int n = read(sock, infos, sizeof(infos));
@@ -108,7 +113,7 @@ void NetClient::receive_game_dimensions(int &width, int &height, int &connect_le
 	if(n != sizeof(infos))
 	{
 		fprintf(stderr, "Error receiving infos\n");
-		exit(4);
+		exit(3);
 	}
 
 	width = infos[0];
@@ -119,4 +124,6 @@ void NetClient::receive_game_dimensions(int &width, int &height, int &connect_le
 	shutdown(sock, SHUT_RDWR);
 	close(sock);
 	sock = -1;
+
+	return true;
 }
