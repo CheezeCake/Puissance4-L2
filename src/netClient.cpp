@@ -9,13 +9,22 @@
 #include "netClient.hpp"
 #include "game.hpp"
 
-netClient::netClien(sockaddr_in host)
+NetClient::NetClient(sockaddr_in host)
 {
 	sock = -1;
 	this->host = host;
 }
 
-bool netClien::poll_reply(Move &move)
+NetClient::~NetClient()
+{
+	if(sock != -1)
+	{
+		shutdown(sock, SHUT_RDWR);
+		close(sock);
+	}
+}
+
+bool NetClient::poll_reply(Move &move)
 {
 	if(sock == -1)
 		return false;
@@ -33,7 +42,7 @@ bool netClien::poll_reply(Move &move)
 	{
 		printf("... ");
 
-		int n = read(responseSocket, &move, sizeof(Move));
+		int n = read(sock, &move, sizeof(Move));
 
 		if(n != sizeof(Move))
 		{
@@ -43,6 +52,7 @@ bool netClien::poll_reply(Move &move)
 
 		print_move("received: ", move);
 
+		shutdown(sock, SHUT_RDWR);
 		close(sock);
 		sock = -1;
 	}
@@ -75,4 +85,38 @@ bool NetClient::send_move(const Move &move)
 	print_move("sent: ", move);
 
 	return true;
+}
+
+void NetClient::receive_game_dimensions(int &width, int &height, int &connect_len, int &nb_connect)
+{
+	int infos[4] = {0};
+
+	if((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1)
+	{
+		perror("Socket");
+		exit(2);
+	}
+
+	if(connect(sock, (sockaddr*)&host, sizeof(host)) == -1)
+	{
+		perror("Connect");
+		exit(3);
+	}
+
+	int n = read(sock, infos, sizeof(infos));
+
+	if(n != sizeof(infos))
+	{
+		fprintf(stderr, "Error receiving infos\n");
+		exit(4);
+	}
+
+	width = infos[0];
+	height = infos[1];
+	connect_len = infos[2];
+	nb_connect = infos[3];
+
+	shutdown(sock, SHUT_RDWR);
+	close(sock);
+	sock = -1;
 }
