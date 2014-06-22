@@ -1,6 +1,8 @@
 #include <iostream>
 #include <cstdlib>
 #include <sstream>
+#include <sys/socket.h>
+#include <arpa/inet.h>
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 #include <SDL/SDL_ttf.h>
@@ -160,6 +162,75 @@ void Gui::play_vs_ai(Game &g, int difficulty)
 	}
 }
 
+void Gui::play_net(Game &g, Net &n, char player_id)
+{
+	bool done = false;
+	SDL_Event event;
+	Move move;
+
+	while(!done)
+	{
+		SDL_WaitEvent(&event);
+
+		if(event.type == SDL_QUIT)
+		{
+			done = true;
+			//on replace l'evènement dans la file
+			SDL_PushEvent(&event);
+		}
+
+		if(g.get_current_player() != player_id)
+		{
+			if(n.poll_reply(move))
+			{
+				if(move.type == ROTATION)
+					g.rotate(move.column);
+				else
+					g.make_move(move.column);
+			}
+		}
+		else
+		{
+			if(event.type == SDL_MOUSEBUTTONUP)
+			{
+				if(event.button.button == SDL_BUTTON_LEFT)
+				{
+					move.type = INSERTION;
+					move.column = (event.button.x/SPRITE_WIDTH)-(size-g.get_width())/2;
+
+					g.make_move(move.column);
+					n.send_move(move);
+				}
+			}
+			else if(event.type == SDL_KEYUP)
+			{
+				int way = -1;
+				if(event.key.keysym.sym == SDLK_RIGHT)
+					way = RIGHT;
+				else if(event.key.keysym.sym == SDLK_LEFT)
+					way = LEFT;
+
+				if(way != -1)
+				{
+					move.type = ROTATION;
+					move.column = way;
+
+					g.rotate(way);
+					n.send_move(move);
+				}
+			}
+		}
+
+		if(g.done())
+			done = true;
+
+		SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+		display_board(g);
+
+		SDL_Flip(screen);
+	}
+}
+
 int Gui::ask_difficulty(SDL_Surface *screen)
 {
 	TTF_Font *font = TTF_OpenFont((char*)"fonts/arial.ttf", HEIGHT/20);
@@ -237,8 +308,10 @@ int Gui::ask_value(SDL_Surface *screen, char *name, int def)
 		input.capture_text(screen);
 		value = atoi(input.get_text().c_str());
 		SDL_PollEvent(&event);
+		/*
 		if(event.type == SDL_QUIT)
 			exit(0);
+			*/
 		input.reset();
 	} while(value <= 0);
 
@@ -249,12 +322,57 @@ int Gui::ask_value(SDL_Surface *screen, char *name, int def)
 }
 
 void Gui::ask_game_dimensions(SDL_Surface *screen, int &width, int &height, int &connect_len,
-                              int &nb_connect)
+		int &nb_connect)
 {
 	width = ask_value(screen, (char*)"Largeur", 7);
 	height = ask_value(screen, (char*)"Hauteur", 6);
 	connect_len = ask_value(screen, (char*)"Taille alignements", 4);
 	nb_connect = ask_value(screen, (char*)"Nombre d'alignements", 1);
+}
+
+void Gui::ask_host_info(SDL_Surface *screen, sockaddr_in *s)
+{
+	int p;
+
+	ask_ip_address(screen, (char*)"Host IP address", s);
+	p = ask_value(screen, (char*)"Port", 6666);
+
+	s->sin_port = htons(p);
+}
+
+void Gui::ask_ip_address(SDL_Surface *screen, char *name, sockaddr_in *s)
+{
+	TTF_Font *font = TTF_OpenFont((char*)"fonts/arial.ttf", HEIGHT/20);
+	SDL_Color color = {255, 255, 255, 0};
+	SDL_Surface *title = TTF_RenderText_Blended(font, name, color);
+
+	SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+	TextInput input(WIDTH/2, HEIGHT/20, 20, (char*)"fonts/arial.ttf",
+			WIDTH/4, HEIGHT/2-HEIGHT/10);
+
+	SDL_Event event;
+	SDL_Rect pos;
+	pos.x = WIDTH/2-title->w/2;
+	pos.y = HEIGHT/20;
+	SDL_BlitSurface(title, NULL, screen, &pos);
+
+	string value;
+	bool ok = false;
+	do
+	{
+		input.capture_text(screen);
+		value = input.get_text();
+		ok = inet_pton(AF_INET, value.c_str(), s); // IPV4 only for now
+		SDL_PollEvent(&event);
+		/*
+		if(event.type == SDL_QUIT)
+			exit(0);
+			*/
+		input.reset();
+	} while(!ok);
+
+	SDL_FreeSurface(title);
+	TTF_CloseFont(font);
 }
 
 void Gui::winner(Game &game)
