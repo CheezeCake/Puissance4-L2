@@ -113,10 +113,8 @@ int main(int argc, char **argv)
 				sockaddr_in host_in;
 				memset(&host_in, 0, sizeof(host_in));
 
-				//Gui::ask_host_info(host);
+				Gui::ask_host_info(screen, &host_in);
 				host_in.sin_family = PF_INET;
-				host_in.sin_port = htons(6666);
-				inet_pton(PF_INET, "127.0.0.1", &host_in.sin_addr);
 
 				SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
 				SDL_Flip(screen);

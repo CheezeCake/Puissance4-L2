@@ -1,6 +1,8 @@
 #include <iostream>
 #include <cstdlib>
 #include <sstream>
+#include <sys/socket.h>
+#include <arpa/inet.h>
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 #include <SDL/SDL_ttf.h>
@@ -326,6 +328,51 @@ void Gui::ask_game_dimensions(SDL_Surface *screen, int &width, int &height, int 
 	height = ask_value(screen, (char*)"Hauteur", 6);
 	connect_len = ask_value(screen, (char*)"Taille alignements", 4);
 	nb_connect = ask_value(screen, (char*)"Nombre d'alignements", 1);
+}
+
+void Gui::ask_host_info(SDL_Surface *screen, sockaddr_in *s)
+{
+	int p;
+
+	ask_ip_address(screen, (char*)"Host IP address", s);
+	p = ask_value(screen, (char*)"Port", 6666);
+
+	s->sin_port = htons(p);
+}
+
+void Gui::ask_ip_address(SDL_Surface *screen, char *name, sockaddr_in *s)
+{
+	TTF_Font *font = TTF_OpenFont((char*)"fonts/arial.ttf", HEIGHT/20);
+	SDL_Color color = {255, 255, 255, 0};
+	SDL_Surface *title = TTF_RenderText_Blended(font, name, color);
+
+	SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+	TextInput input(WIDTH/2, HEIGHT/20, 20, (char*)"fonts/arial.ttf",
+			WIDTH/4, HEIGHT/2-HEIGHT/10);
+
+	SDL_Event event;
+	SDL_Rect pos;
+	pos.x = WIDTH/2-title->w/2;
+	pos.y = HEIGHT/20;
+	SDL_BlitSurface(title, NULL, screen, &pos);
+
+	string value;
+	bool ok = false;
+	do
+	{
+		input.capture_text(screen);
+		value = input.get_text();
+		ok = inet_pton(AF_INET, value.c_str(), s); // IPV4 only for now
+		SDL_PollEvent(&event);
+		/*
+		if(event.type == SDL_QUIT)
+			exit(0);
+			*/
+		input.reset();
+	} while(!ok);
+
+	SDL_FreeSurface(title);
+	TTF_CloseFont(font);
 }
 
 void Gui::winner(Game &game)
